@@ -1,29 +1,35 @@
 {
   "expo": {
-    "name": "ov-crm-mobile",
-    "slug": "ov-crm-mobile",
+    "name": "poso-note-app",
+    "slug": "poso-note-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/AppIcons/android/ic_launcher.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.poso.poso-note-app",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
+    },
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/AppIcons/android/ic_launcher.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "ios": {
-      "supportsTablet": true
-    },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/AppIcons/android/ic_launcher.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/AppIcons/android/ic_launcher.png"
     }
   }
 }
