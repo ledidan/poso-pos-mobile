@@ -9,8 +9,8 @@ import FoodMenuFuncs from "../../Functions/FoodMenuFuncs";
 
 const { ADD_ITEM_TO_GROUP, CREATE_NEW_MENU_GROUP, CREATE_NEW_MENU } = API_PATHS;
 
-  // const {  FoodMenuFuncs } = Functions;
-  // FoodMenuFuncs
+// const {  FoodMenuFuncs } = Functions;
+// FoodMenuFuncs
 // -----------------------------------------------------------------------
 // Add a group to a menu
 
@@ -456,9 +456,12 @@ const SaveChangedGroupInfo = ({ groupID, groupInfo, shopID }) =>
 
 const SaveChangedItemInfo = ({ itemID, itemInfo, shopID }) =>
   new Promise((resolve, reject) => {
-    if (!itemID || Object.keys(itemInfo).length === 0 || !shopID)
+    if (!itemID || !shopID)
       return reject("(SaveChangedItemInfo) Parameters are not sufficient.");
-    const sanitizedItemInfo = SanitizeItemInfoBeforeSubmit(itemInfo, "edit");
+    const isEmpty = !itemInfo || Object.keys(itemInfo).length === 0;
+    const sanitizedItemInfo = isEmpty
+      ? {}
+      : FoodMenuFuncs.SanitizeItemInfoBeforeSubmit(itemInfo, "edit");
     const params = { itemID, itemInfo: sanitizedItemInfo, shopID };
     axios
       .post(API_PATHS.SAVE_CHANGED_ITEM_INFO, params)

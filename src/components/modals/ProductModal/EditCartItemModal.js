@@ -12,7 +12,6 @@ import InputField from "../../ui/InputField";
 import { Dialog } from "@rneui/base";
 import NumberField from "../../ui/NumberField";
 import { Ionicons } from "@expo/vector-icons";
-import DismissKeyboard from "../DismissKeyboard";
 
 const EditCartItemModal = ({
   isVisible,
@@ -36,6 +35,7 @@ const EditCartItemModal = ({
   const handleChange = (field, value) => {
     setItemData((prev) => ({ ...prev, [field]: value }));
   };
+
   const handleClose = () => {
     onClose();
   };
@@ -47,6 +47,7 @@ const EditCartItemModal = ({
     removeItem(id);
     handleClose();
   };
+
   return (
     <Dialog
       isVisible={isVisible}

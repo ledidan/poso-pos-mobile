@@ -25,12 +25,13 @@ const AIPOS = ({
   // navigation
   const { CreateNewItem, SaveChangedItemInfo } = Merchants.PostRequests;
   const navigation = useNavigation();
-  const { bill } = useRoute().params || {};
+  const { bill = {} } = useRoute().params || {};
   const [showPanel, setShowPanel] = useState(false);
   const [initialCart, setInitialCart] = useState([]);
   const [input, setInput] = useState("");
+
   const {
-    items: cart,
+    orderItems: cart,
     addItem,
     removeItem,
     clearCart,
@@ -43,13 +44,14 @@ const AIPOS = ({
   const [showEditModal, setShowEditModal] = useState(false);
 
   const [editItem, setEditItem] = useState(null);
-
+  const [note, setNote] = useState("");
   const [orderID, setOrderID] = useState(null);
 
   const [orderHandler, setOrderHandler] = useState({
     submittedOrderDeliveryTypeID: "pickUp",
     isSendingOrderToShop: false,
     isSavingItem: false,
+    isCreatingItem: false,
   });
   const updateOrderHandler = (value) =>
     setOrderHandler((prev) => ({ ...prev, ...value }));
@@ -69,13 +71,13 @@ const AIPOS = ({
     return () => {
       unregisterDismissAction("closePanelAction");
     };
-  }, []);
+  }, [showPanel]);
 
   useEffect(() => {
-    if (bill && bill.items) {
+    if (bill && bill.orderItems) {
       setOrderID(bill.orderID);
-      updateCart(bill.orderID, bill.items);
-      setInitialCart(bill.items);
+      updateCart(bill.orderID, bill.orderItems);
+      setInitialCart(bill.orderItems);
     }
   }, [bill]);
 
@@ -86,6 +88,7 @@ const AIPOS = ({
         itemInfo: {
           ...cartItem,
           quantity: cartItem.quantity,
+          itemNote: cartItem.itemNote || "",
           modifierGroups: cartItem.modifierGroups || [],
         },
       })
@@ -105,12 +108,17 @@ const AIPOS = ({
         isSendingOrderToShop: false,
         submittedOrderDeliveryTypeID: orderDeliveryTypeID,
       });
+      NotificationToast.error("Lỗi khi đặt hàng");
       return;
     }
-
     updateOrderHandler({
       isSendingOrderToShop: false,
     });
+    if (orderID) {
+      NotificationToast.success("Cập nhật đơn hàng thành công");
+    } else {
+      NotificationToast.success("Đặt hàng thành công");
+    }
     clearCart();
     navigation.navigate("BillScreen", {
       orderID: orderID,
@@ -118,14 +126,19 @@ const AIPOS = ({
   };
 
   const onCheckOut = async (orderDetails = {}) => {
-    updateOrderHandler({
-      isSendingOrderToShop: true,
-    });
-    onSubmitOrderToShop({
-      ...orderDetails,
-      status: "active",
-    });
+    try {
+      updateOrderHandler({
+        isSendingOrderToShop: true,
+      });
+      await onSubmitOrderToShop({
+        ...orderDetails,
+        status: "active",
+      });
+    } catch (err) {
+      NotificationToast.error("Có lỗi xảy ra khi thanh toán");
+    }
   };
+
   const handleSubmitOrder = async () => {
     if (!cart.length) {
       NotificationToast.error(
@@ -134,14 +147,18 @@ const AIPOS = ({
       );
       return;
     }
-    await onCheckOut({
-      orderItems: getOrderItemsForOrderDetails(),
-      orderDeliveryTypeID: "pickUp",
-      paymentMethodDetail: "",
-      total: total,
-      timeStamp: new Date().toISOString(),
-      status: "active",
-    });
+    try {
+      await onCheckOut({
+        orderItems: getOrderItemsForOrderDetails(),
+        orderDeliveryTypeID: "pickUp",
+        paymentMethodDetail: "",
+        total: total,
+        timeStamp: new Date().toISOString(),
+        isPaid: false,
+      });
+    } catch (err) {
+      NotificationToast.error("Có lỗi xảy ra khi thanh toán");
+    }
   };
 
   const checkCartChanged = () => {
@@ -165,16 +182,13 @@ const AIPOS = ({
       isSavingItem: true,
     });
     try {
-      const { sanitizedItemInfo } = await SaveChangedItemInfo({
+      await SaveChangedItemInfo({
         itemID,
         itemInfo: {},
         shopID,
       });
-      if (sanitizedItemInfo) {
-        onUpdateAllItems({ itemID, itemInfo: sanitizedItemInfo });
-        NotificationToast.success("Xóa sản phẩm thành công");
-        return true;
-      }
+      removeItem(itemID);
+      NotificationToast.success("Xóa sản phẩm thành công");
     } catch (error) {
       NotificationToast.error("Lỗi khi xóa sản phẩm");
     } finally {
@@ -183,36 +197,36 @@ const AIPOS = ({
       });
       refetch();
     }
-    return false;
   };
 
-  const onSaveItem = async (itemInfo) => {
-      updateOrderHandler({
+  const onSaveItemAPI = async (itemInfo = {}) => {
+    updateOrderHandler({
       isCreatingItem: true,
     });
+    if (!itemInfo || Object.keys(itemInfo).length === 0) {
+      NotificationToast.error("Thông tin sản phẩm không được để trống");
+      return false;
+    }
+    const { itemID = "" } = itemInfo || {};
     const params = { itemID, itemInfo, shopID };
     try {
-      const { sanitizedItemInfo } = await SaveChangedItemInfo(params);
-      if (sanitizedItemInfo) {
-        onUpdateAllItems({ itemInfo: sanitizedItemInfo });
-        updateOrderHandler({
-          isSavingItem: false,
-        });
-        return true;
-      }
+      await SaveChangedItemInfo(params);
+      updateOrderHandler({
+        isSavingItem: false,
+      });
       NotificationToast.error("Lỗi khi lưu sản phẩm");
+      return true;
     } catch (error) {
       NotificationToast.error("Lỗi khi lưu sản phẩm");
+      return false;
     } finally {
       updateOrderHandler({
         isCreatingItem: false,
       });
       refetch();
     }
-    return false;
   };
-
-  const onCreateNewItem = async (itemInfo) => {
+  const onCreateNewItemAPI = async (itemInfo) => {
     updateOrderHandler({
       isCreatingItem: true,
     });
@@ -236,15 +250,27 @@ const AIPOS = ({
   };
 
   const onSubmitItemInfo = async (itemInfo) => {
+    const sanitizedItemInfo = {
+      ...itemInfo,
+      itemImages: itemInfo.itemImages || { full: { imageUrl: "" } },
+      itemIsArchived: itemInfo.itemIsArchived || { false: "checked" },
+      modifierGroups: itemInfo.modifierGroups || [],
+    };
     const res = await (showEditModal
-      ? onSaveItem(itemInfo)
-      : onCreateNewItem(itemInfo));
+      ? onSaveItemAPI({
+          ...sanitizedItemInfo,
+        })
+      : onCreateNewItemAPI({
+          ...sanitizedItemInfo,
+        }));
     try {
       if (res) {
         NotificationToast.success(
           `${showEditModal ? "Lưu" : "Tạo"} ${itemInfo.itemName}`
         );
         setShowEditModal(false);
+        updateItem(itemInfo.itemID, itemInfo);
+        onUpdateAllItems({ itemID: itemInfo.itemID, itemInfo });
         updateOrderHandler({
           isSavingItem: false,
         });
@@ -264,20 +290,25 @@ const AIPOS = ({
     setEditItem(item);
     setShowEditModal(true);
   };
+
   const closePanelAction = () => {
     if (showPanel) {
       setShowPanel(false);
     }
   };
 
+
+  console.log("menus", JSON.stringify(menus, null, 2));
   return (
     <TouchableWithoutFeedback onPress={dismissAllActions}>
       <View style={{ flex: 1, backgroundColor: "#FFF" }}>
-        <LoadingDialog
+        {/* <LoadingDialog
           isVisible={
-            orderHandler.isSavingItem || orderHandler.isSendingOrderToShop
+             orderHandler?.isSavingItem ||
+    orderHandler?.isSendingOrderToShop ||
+    orderHandler?.isCreatingItem
           }
-        />
+        /> */}
         <CartModals
           editItem={editItem}
           showEditModal={showEditModal}
@@ -298,27 +329,32 @@ const AIPOS = ({
           orderHandler={orderHandler}
         />
         <CartHeader
+          bill={bill}
           onClose={checkCartChanged}
           onSave={handleSubmitOrder}
           isSaving={orderHandler.isSendingOrderToShop}
         />
         <CartList
           cart={cart}
+          bill={bill}
+          total={total}
           onEditItem={onEditItem}
           onAddNew={() => setShowPanel(true)}
         />
-        <CartTotal total={total} />
-        <CartInputBar
-          onSubmitRemoveItem={onRemoveItem}
-          onSubmitItemInfo={onSubmitItemInfo}
-          input={input}
-          setInput={setInput}
-          showPanel={showPanel}
-          setShowPanel={setShowPanel}
-          menus={menus}
-          addItem={addItem}
-          onAddNew={() => setShowAddModal(true)}
-        />
+        {!bill.isPaid && <CartTotal total={total} />}
+        {!bill.isPaid && (
+          <CartInputBar
+            onSubmitRemoveItem={onRemoveItem}
+            onSubmitItemInfo={onSubmitItemInfo}
+            input={input}
+            setInput={setInput}
+            showPanel={showPanel}
+            setShowPanel={setShowPanel}
+            menus={menus}
+            addItem={addItem}
+            onAddNew={() => setShowAddModal(true)}
+          />
+        )}
       </View>
     </TouchableWithoutFeedback>
   );

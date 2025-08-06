@@ -1,53 +1,87 @@
-import React from "react";
-import { View, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import React, { useMemo, useState } from "react";
+import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Keyboard,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { InputFunctions } from "../RegexInputFunctions";
+// import VoiceInput from "../ui/VoiceInput";
 
-const InputBar = ({ value, onChange, onTogglePanel, onSend, isPanelOpen }) => (
-  <View
-    style={[
-      styles.bar,
-      isPanelOpen ? { marginBottom: 0 } : { marginBottom: 20 },
-    ]}
-  >
-    <TouchableOpacity
-      style={[styles.iconBtn, isPanelOpen && styles.iconBtnOpen]}
-      onPress={() => onTogglePanel(!isPanelOpen)}
+const InputBar = ({ value, onChange, onTogglePanel, onSend, isPanelOpen, menus }) => {
+  const [parsedInput, setParsedInput] = useState({});
+  const allProducts = useMemo(() => {
+    if (!menus || typeof menus !== "object") return [];
+  
+    return Object.entries(menus).map(([itemID, item]) => ({
+      ...item,
+      itemID, 
+    }));
+  }, [menus]);
+  const handleChange = (text) => {
+    const parsed = InputFunctions.parseInputWithMenu(text, allProducts);
+    setParsedInput(parsed);
+    onChange(text);
+  };
+
+  const handleSend = () => {
+    console.log("parsedInput", JSON.stringify(parsedInput, null, 2));
+    onSend(parsedInput);
+  };
+
+  return (
+    <View
+      style={[
+        styles.bar,
+        isPanelOpen ? { marginBottom: 0 } : { marginBottom: 20 },
+      ]}
     >
-      <Ionicons
-        name="grid-outline"
-        size={22}
-        color={isPanelOpen ? "#fff" : "#007AFF"}
-      />
-    </TouchableOpacity>
-    <View style={styles.wrapper}>
-      <TextInput
-        style={styles.input}
-        placeholder="Nhập số lượng + tên hàng + giá bán"
-        value={value}
-        onChangeText={onChange}
-        onPressIn={() => onTogglePanel(false)}
-      />
-      {value.length > 0 && (
-        <View style={styles.actions}>
-          <TouchableOpacity
-            onPress={() => onChange("")}
-            style={styles.closeBtn}
-          >
-            <Ionicons name="close" size={20} color="#fff" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={onSend} style={styles.sendBtn}>
-            <Ionicons
-              name="send"
-              size={26}
-              color="#007AFF"
-              style={{ marginLeft: 20, marginRight: 5 }}
-            />
-          </TouchableOpacity>
-        </View>
-      )}
+      {/* <VoiceInput onResult={handleChange} /> */}
+      <TouchableOpacity
+        style={[styles.iconBtn, isPanelOpen && styles.iconBtnOpen]}
+        onPress={() => {
+          Keyboard.dismiss();
+          onTogglePanel(!isPanelOpen);
+        }}
+      >
+        <Ionicons
+          name="grid-outline"
+          size={22}
+          color={isPanelOpen ? "#fff" : "#007AFF"}
+        />
+      </TouchableOpacity>
+      <View style={styles.wrapper}>
+        <TextInput
+          style={styles.input}
+          placeholder="Nhập số lượng + tên hàng + giá bán"
+          value={value}
+          onChangeText={handleChange}
+          onPressIn={() => onTogglePanel(false)}
+        />
+        {value.length > 0 && (
+          <View style={styles.actions}>
+            <TouchableOpacity
+              onPress={() => onChange("")}
+              style={styles.closeBtn}
+            >
+              <Ionicons name="close" size={20} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleSend} style={styles.sendBtn}>
+              <Ionicons
+                name="send"
+                size={26}
+                color="#007AFF"
+                style={{ marginLeft: 20, marginRight: 5 }}
+              />
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   bar: {

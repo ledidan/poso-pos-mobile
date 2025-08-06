@@ -8,14 +8,12 @@ import {
   Image,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
 const MoreScreen = () => {
-  const { top } = useSafeAreaInsets();
   const navigate = useNavigation();
   return (
-    <ScrollView style={[styles.container, { paddingTop: top }]}>
+    <ScrollView style={[styles.container]}>
       {/* Avatar + Info */}
       <View style={styles.header}>
         <View style={styles.avatarCircle}>

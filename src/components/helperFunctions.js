@@ -62,7 +62,7 @@ class HelperFunctions {
             itemCalories: itemObj.itemCalories
               ? String(itemObj.itemCalories)
               : undefined,
-            itemNote: itemObj.itemNote ? String(itemObj.itemNote) : undefined,
+            // itemNote: itemObj.itemNote ? String(itemObj.itemNote) : "",
             itemKitchenChitName: itemObj.itemKitchenChitName
               ? String(itemObj.itemKitchenChitName)
               : undefined,
@@ -119,7 +119,7 @@ class HelperFunctions {
         itemCalories: itemObj.itemCalories
           ? String(itemObj.itemCalories)
           : undefined,
-        itemNote: itemObj.itemNote ? String(itemObj.itemNote) : undefined,
+        // itemNote: itemObj.itemNote ? String(itemObj.itemNote) : "",
         itemKitchenChitName: itemObj.itemKitchenChitName
           ? String(itemObj.itemKitchenChitName)
           : undefined,
@@ -169,6 +169,7 @@ class HelperFunctions {
         itemDescription: item.itemSimpleDescription?.itemDescription || "",
         itemIsDiscount: item.itemSimpleDescription?.itemIsDiscount || false,
         itemDiscountRate: item.itemSimpleDescription?.itemDiscountRate || 0,
+        itemNote: item.itemSimpleDescription?.itemNote || "",
         itemIsBestSeller: item.itemSimpleDescription?.itemIsBestSeller || false,
         itemIsTopRated: item.itemSimpleDescription?.itemIsTopRated || false,
       }));
@@ -176,12 +177,25 @@ class HelperFunctions {
       return {
         orderID,
         customerName,
-        orderType: orderDeliveryTypeID,
+        isPaid: bill.isPaid || false,
+        paymentMethod: bill.paymentMethod || "",
+        paymentMethodDetail: bill.paymentMethodDetail || "",
+        status: bill.status || "",
+        orderDeliveryTypeID,
         total,
         timeStamp,
-        items,
+        orderItems: items,
       };
     });
+  }
+  static normalizeInput(text) {
+    return text
+      .toLowerCase()
+      .replace(/ngh[ìi]n|ng[àa]n/g, "000")
+      .replace(/(\d)[.,](\d)/g, "$1$2") // 20.000 => 20000
+      .replace(/(\d+)\s*k\b/g, (_, num) => `${num}000`) // 20k => 20000
+      .replace(/\s+/g, " ")
+      .trim();
   }
 }
 

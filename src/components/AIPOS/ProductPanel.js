@@ -31,7 +31,7 @@ const ProductPanel = ({
 
   useEffect(() => {
     const closeDeleteModeAction = () => {
-      if (isLongPress) {
+      if (isLongPress && visible) {
         handlePressOut();
       }
     };
@@ -39,7 +39,8 @@ const ProductPanel = ({
     return () => {
       unregisterDismissAction("productPanelDeleteMode");
     };
-  }, [isLongPress, registerDismissAction, unregisterDismissAction]);
+  }, [isLongPress, registerDismissAction, unregisterDismissAction, visible]);
+
   // const allProducts = useMemo(() => {
   //   const products = [];
   //   if (!menus) return products;
@@ -62,7 +63,14 @@ const ProductPanel = ({
   //   }
   //   return products;
   // }, [menus]);
-
+  const allProducts = useMemo(() => {
+    if (!menus || typeof menus !== "object") return [];
+  
+    return Object.entries(menus).map(([itemID, item]) => ({
+      ...item,
+      itemID, 
+    }));
+  }, [menus]);
 
   const handleLongPress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
@@ -84,6 +92,8 @@ const ProductPanel = ({
       setIsLongPress(false);
     });
   };
+  if (!visible) return null;
+
   return (
     <View style={styles.panel}>
       <ConfirmDialog
@@ -92,6 +102,7 @@ const ProductPanel = ({
         onConfirm={() => {
           onSubmitRemoveItem(selectedItem.itemID);
           setSelectedItem({});
+          // xoa thanh cong 
         }}
         title="Xóa sản phẩm"
         message={`Bạn có chắc chắn muốn xóa sản phẩm ${selectedItem.itemName} không?`}
@@ -106,17 +117,18 @@ const ProductPanel = ({
             <Ionicons name="add-outline" size={30} color="#007AFF" />
             <Text style={styles.addTxt}>Thêm hàng</Text>
           </TouchableOpacity>
-          {Object.entries(menus).map(([itemID, item]) => {
+          {allProducts.map((item, index) => {
             const imageUrl = `${EXPO_PUBLIC_IMAGE_SOURCE}/${item.itemImage}`;
+            // console.log("item", JSON.stringify(item, null, 2))
             return (
               <TouchableOpacity
-                key={itemID}
+                key={index}
                 style={[styles.chip, isLongPress && styles.selectedChip]}
                 onPress={() => {
                   onAddChip(item);
                 }}
                 onLongPress={handleLongPress}
-                delayLongPress={100}
+                delayLongPress={300}
               >
                 {isLongPress && (
                   <TouchableOpacity

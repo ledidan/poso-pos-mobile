@@ -3,18 +3,17 @@ import React from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-const Header = () => {  
+const Header = ({ selectedRange, onPressFilter }) => {  
   return (
     <View style={styles.header}>
       <View style={styles.logoRow}>
         <Image source={require("../../../assets/AppIcons/poso-logo-black-text.png")} style={styles.logo} />
-        {/* <Text style={styles.appName}>PosoNote</Text> */}
       </View>
 
       <View style={styles.actions}>
         <Ionicons name="call-outline" size={24} color="#333" />
-        <TouchableOpacity style={styles.dateFilter}>
-          <Text style={styles.dateText}>Tháng này</Text>
+        <TouchableOpacity style={styles.dateFilter} onPress={onPressFilter}>
+          <Text style={styles.dateText}>{selectedRange}</Text>
           <Ionicons name="chevron-down" size={16} color="#333" />
         </TouchableOpacity>
       </View>

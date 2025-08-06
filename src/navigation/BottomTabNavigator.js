@@ -24,11 +24,12 @@ export default function BottomTabNavigator() {
           paddingTop: 10,
         },
         tabBarLabelStyle: {
-          color: "#505e70",
           paddingTop: 10,
           fontWeight: "500",
         },
         headerShown: false,
+        tabBarActiveTintColor: "#ff800a",
+        tabBarInactiveTintColor: "#505e70",
       })}
     >
       <Tab.Screen
@@ -36,8 +37,12 @@ export default function BottomTabNavigator() {
         component={HomeScreen}
         options={{
           tabBarLabel: "Tổng quan",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="bar-chart-outline" size={size} color={color} />
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name="bar-chart-outline"
+              size={size}
+              color={focused ? "#ff800a" : "#505e70"}
+            />
           ),
         }}
       />
@@ -47,8 +52,12 @@ export default function BottomTabNavigator() {
         component={QrScreen}
         options={{
           tabBarLabel: "Thanh toán QR",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="qr-code-outline" size={size} color={color} />
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name="qr-code-outline"
+              size={size}
+              color={focused ? "#ff800a" : "#505e70"}
+            />
           ),
         }}
       />
@@ -57,18 +66,33 @@ export default function BottomTabNavigator() {
         name="AI"
         component={AIScreen}
         options={{
-          tabBarLabel: "Tính tiền AI",
-          tabBarIcon: () => <CustomTabIcon />,
+          tabBarLabel: "Tính tiền",
+          tabBarIcon: ({ color, size, focused }) => (
+            <CustomTabIcon
+              color={focused ? "#ff800a" : "#505e70"}
+              size={size}
+            />
+          ),
         }}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            e.preventDefault();
+            navigation.navigate("AIScreen");
+          },
+        })}
       />
 
-      <Tab.Screen 
+      <Tab.Screen
         name="Bill"
         component={BillScreen}
         options={{
           tabBarLabel: "Hoá đơn",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="document-text-outline" size={size} color={color} />
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name="document-text-outline"
+              size={size}
+              color={focused ? "#ff800a" : "#505e70"}
+            />
           ),
         }}
       />
@@ -78,8 +102,12 @@ export default function BottomTabNavigator() {
         component={MoreScreen}
         options={{
           tabBarLabel: "Nhiều hơn",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="menu-outline" size={size} color={color} />
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name="menu-outline"
+              size={size}
+              color={focused ? "#ff800a" : "#505e70"}
+            />
           ),
         }}
       />

@@ -289,12 +289,12 @@ const NEW_ITEM_FIELDS = [
     label: "Dị ứng",
     options: [],
   },
-  {
-    fieldKind: "textarea",
-    id: "itemNote",
-    label: "Ghi chú cho khách hàng",
-    rows: 3,
-  },
+  // {
+  //   fieldKind: "textarea",
+  //   id: "itemNote",
+  //   label: "Ghi chú cho khách hàng",
+  //   rows: 3,
+  // },
 ];
 
 // ---------------------------------------------------------------------
