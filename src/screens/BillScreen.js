@@ -18,7 +18,7 @@ const BillScreen = () => {
     onGetActiveOrders();
   }, []);
 
-  return <Bill bills={bills} />;
+  return <Bill bills={bills} shopID={shopID} refetch={onGetActiveOrders} />;
 };
 
 export default BillScreen;

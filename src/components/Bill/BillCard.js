@@ -10,14 +10,16 @@ import {
 } from "react-native-popup-menu";
 import { useNavigation } from "@react-navigation/native";
 
-const BillCard = ({ bill = {}, index = 0 }) => {
-  const removeBill = () => {
-    console.log("removeBill", bill);
-  };
+const BillCard = ({
+  bill = {},
+  index = 0,
+  onSubmitChangeOrder = () => {},
+  onSubmitCloseOrder = () => {},
+}) => {
   const navigate = useNavigation();
   return (
     <View
-      style={[styles.card, index % 2 === 0 ? styles.cardBlue : styles.cardGray]}
+      style={[styles.card, !bill.isPaid ? styles.cardBlue : styles.cardGray]}
     >
       <TouchableOpacity onPress={() => navigate.navigate("AIScreen", { bill })}>
         <View style={styles.header}>
@@ -36,7 +38,7 @@ const BillCard = ({ bill = {}, index = 0 }) => {
 
         <View style={styles.content}>
           <View style={styles.itemsBlock}>
-            {bill.items.map((item, i) => (
+            {bill.orderItems.map((item, i) => (
               <Text style={styles.itemText} key={i}>
                 {item.itemName} x{item.quantity}
               </Text>
@@ -88,7 +90,7 @@ const BillCard = ({ bill = {}, index = 0 }) => {
               <Text style={styles.menuOptionText}>In hóa đơn</Text>
             </MenuOption>
             <View style={styles.divider} />
-            <MenuOption
+            {/* <MenuOption
               onSelect={() => alert(`Xóa hóa đơn ${bill.orderID}`)}
               style={{
                 padding: 10,
@@ -103,19 +105,56 @@ const BillCard = ({ bill = {}, index = 0 }) => {
                 style={{ marginRight: 10 }}
               />
               <Text style={[styles.menuOptionText, { color: "red" }]}>Xóa</Text>
-            </MenuOption>
+            </MenuOption> */}
           </MenuOptions>
         </Menu>
-        <TouchableOpacity style={styles.row}>
-          <Ionicons name="qr-code-outline" size={20} color="#777" />
-          <Text style={styles.optionText}>Mã QR</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.paidBtn}
-          onPress={() => console.log("Thanh toán")}
-        >
-          <Text style={styles.paidText}>Thanh toán</Text>
-        </TouchableOpacity>
+        {bill.isPaid === false && (
+          <TouchableOpacity style={styles.row}>
+            <Ionicons name="qr-code-outline" size={20} color="#777" />
+            <Text style={styles.optionText}>Mã QR</Text>
+          </TouchableOpacity>
+        )}
+        {bill.isPaid === true ? (
+          <View style={styles.row}>
+            <TouchableOpacity
+              style={styles.closeOrderBtn}
+              onPress={() => onSubmitCloseOrder(bill.orderID)}
+            >
+              <Ionicons name="save-outline" size={20} color="#fff" />
+              <Text style={styles.closeOrderText}>Đóng đơn</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.cancelPaidBtn}
+              onPress={() =>
+                onSubmitChangeOrder(bill.orderID, {
+                  ...bill,
+                  isPaid: false,
+                  paymentMethod: "",
+                  paymentMethodDetail: "",
+                  status: "confirmed",
+                })
+              }
+            >
+              <Ionicons name="close-outline" size={20} color="#FF3B30" />
+              <Text style={styles.cancelPaidText}>Huỷ thanh toán</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <TouchableOpacity
+            style={styles.paidBtn}
+            onPress={() =>
+              onSubmitChangeOrder(bill.orderID, {
+                ...bill,
+                isPaid: true,
+                paymentMethod: "cash",
+                paymentMethodDetail: "cod",
+                status: "confirmed",
+              })
+            }
+          >
+            <Text style={styles.paidText}>Thanh toán</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -127,7 +166,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
@@ -137,7 +176,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderStyle: "dashed",
   },
-  cardGray: { borderWidth: 0 },
+  cardGray: { borderWidth: 0, backgroundColor: "#f9f9f9" },
   header: {
     flexDirection: "row",
     marginBottom: 6,
@@ -196,6 +235,25 @@ const styles = StyleSheet.create({
     width: 200,
     padding: 10,
   },
+  cancelPaidBtn: {
+    // backgroundColor: "#FF3B30",
+    paddingHorizontal: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  cancelPaidText: { color: "#FF3B30", fontWeight: "600" },
+  closeOrderBtn: {
+    paddingHorizontal: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fd8c33",
+    gap: 4,
+    paddingVertical: 8,
+    borderRadius: 10,
+  },
+  closeOrderText: { color: "#fff", fontWeight: "500" },
 });
 
 export default BillCard;

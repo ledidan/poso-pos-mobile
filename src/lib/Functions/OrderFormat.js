@@ -12,11 +12,17 @@ const _initializeDetailsOfItemInCart = ({
     itemKitchenChitName = "",
     itemName,
     itemPrice = "",
+    itemNote = "",
     itemSaleRate = 0,
   } = itemInfo;
   const detailsOfItemInCart = {
     itemID,
-    itemSimpleDescription: { itemKitchenChitName, itemName, itemPrice },
+    itemSimpleDescription: {
+      itemKitchenChitName,
+      itemName,
+      itemPrice,
+      itemNote,
+    },
     quantity: itemInfo.quantity || 1,
     isNewOrder,
   };

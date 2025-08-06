@@ -1,15 +1,15 @@
 {
   "expo": {
-    "name": "poso-note-app",
-    "slug": "poso-note-app",
+    "name": "poso-note",
+    "slug": "poso-note",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/AppIcons/android/ic_launcher.png",
+    "icon": "./assets/AppIcons/android/mipmap-hdpi/ic_launcher.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.poso.poso-note-app",
+      "bundleIdentifier": "com.poso.poso-note",
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
@@ -17,19 +17,26 @@
       }
     },
     "splash": {
-      "image": "./assets/AppIcons/android/ic_launcher.png",
+      "image": "./assets/AppIcons/android/mipmap-hdpi/ic_launcher.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/AppIcons/android/ic_launcher.png",
+        "foregroundImage": "./assets/AppIcons/android/mipmap-hdpi/ic_launcher.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.ledidan.posonote"
     },
     "web": {
-      "favicon": "./assets/AppIcons/android/ic_launcher.png"
-    }
+      "favicon": "./assets/AppIcons/android/mipmap-hdpi/ic_launcher.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "660152c8-0f1e-40f0-ba41-30413ecec418"
+      }
+    },
+    "owner": "ledidan"
   }
 }

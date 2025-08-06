@@ -2,8 +2,9 @@ import React from "react";
 import { View, FlatList, Text, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ItemCard from "../ItemCard";
+import CartTotal from "./CartTotal";
 
-const CartList = ({ cart, onEditItem, onAddNew }) => {
+  const CartList = ({ cart, onEditItem, onAddNew, total , bill = {}}) => {
   return (
     <View style={{ flex: 1, backgroundColor: "#EAF5FF" }}>
       <FlatList
@@ -13,6 +14,7 @@ const CartList = ({ cart, onEditItem, onAddNew }) => {
         renderItem={({ item }) => (
           <View style={{ paddingHorizontal: 20 }}>
             <ItemCard item={item} onPress={() => onEditItem(item)} />
+              {bill.isPaid && <CartTotal total={total} />}
           </View>
         )}
         ListEmptyComponent={

@@ -1,76 +1,100 @@
-// components/RevenueChart.jsx
 import React from "react";
-import { Text, StyleSheet, View, Dimensions } from "react-native";
-import { LineChart } from "react-native-chart-kit";
+import { View, Text, StyleSheet } from "react-native";
+import { BarChart } from "react-native-gifted-charts";
+import { Ionicons } from "@expo/vector-icons";
 
-const screenWidth = Dimensions.get("window").width;
+const RevenueChart = ({ data, initialScrollIndex     }) => {
+  const hasData = data && data.length > 0;
+  
+  const maxValue = hasData ? Math.max(...data.map(item => item.value)) : 100;
+  const stepValue = Math.ceil(maxValue / 6 / 1000) * 1000;
 
-const RevenueChart = () => {
-  const chartData = {
-    labels: ["", "", "", "1", "", "", ""],
-    datasets: [
-      {
-        data: [0, 20, 60, 100, 80, 40, 0],
-        color: (opacity = 1) => `rgba(0, 122, 255, ${opacity})`,
-        strokeWidth: 2,
-      },
-    ],
+  const formatAxisLabel = (value) => {
+    if (value >= 1000000) {
+      return `${value / 1000000}Tr`;
+    }
+    if (value >= 1000) {
+      return `${value / 1000}k`;
+    }
+    return value;
   };
-
-  const chartConfig = {
-    backgroundGradientFrom: "#ffffff",
-    backgroundGradientTo: "#ffffff",
-    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-    strokeWidth: 2,
-    fillShadowGradient: "#007AFF",
-    fillShadowGradientOpacity: 0.4,
-    propsForDots: { r: "0" },
-    propsForLabels: { fontSize: 12, fontWeight: "500" },
-  };
-
   return (
-    <View style={styles.contentCard}>
-      <Text style={styles.sectionTitle}>Biểu đồ doanh thu</Text>
-      <LineChart
-        data={chartData}
-        width={screenWidth - 64}
-        height={220}
-        chartConfig={chartConfig}
-        bezier
-        withVerticalLines={false}
-        withHorizontalLines={true}
-        withInnerLines={false}
-        withShadow={false}
-        fromZero={true}
-        yAxisLabel=""
-        yAxisSuffix="N"
-        style={styles.chart}
-      />
+    <View style={styles.container}>
+      <Text style={styles.title}>Doanh thu</Text>
+      <View style={styles.chartContainer}>
+        {hasData ? (
+          <BarChart
+            data={data}
+            scrollToIndex={initialScrollIndex}
+            barWidth={30}
+            initialSpacing={30}
+            spacing={20}
+            barBorderRadius={4}
+            showGradient
+            formatYLabel={formatAxisLabel}
+            yAxisLabelWidth={60}
+            yAxisLabelContainerStyle={{
+              alignItems: 'center',
+              justifyContent: 'start',
+            }}
+            yAxisThickness={0}
+            xAxisType={'dashed'}
+            xAxisColor={'#505e70'}
+            yAxisTextStyle={{ color: '#505e70' }}
+            stepValue={stepValue}
+            maxValue={maxValue === 0 ? 200 : maxValue * 1.2} 
+            noOfSections={6}
+            xAxisLabelTextStyle={{ color: '#505e70', textAlign: 'center', fontSize: 10 }}
+            showLine
+            lineConfig={{
+              color: "#F29C6E",
+              thickness: 3,
+              curved: true,
+              hideDataPoints: true,
+              shiftY: 20,
+              initialSpacing: -20,
+              shiftX: 10,
+            }}
+          />
+        ) : (
+          <View style={styles.noDataContainer}>
+            <Ionicons name="bar-chart-outline" size={36} color="#006afc" />
+            <Text style={styles.noDataText}>Chưa có dữ liệu</Text>
+          </View>
+        )}
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  contentCard: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3.84,
-    elevation: 2,
+  container: {
+    marginVertical: 10,
+    padding: 16,
+    borderRadius: 20,
+    // backgroundColor: '#232B5D',
+    backgroundColor: '#fff',
   },
-  sectionTitle: {
+  title: {
+    color: '#000',
     fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 16,
-    color: "#1C1C1E",
+    fontWeight: 'bold',
+    marginBottom: 10,
+    marginTop: 10,
   },
-  chart: {
-    borderRadius: 16,
-    marginLeft: -10,
+  chartContainer: {
+    paddingTop: 20,
+  },
+  noDataContainer: {
+    height: 200,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noDataText: {
+    marginTop: 16,
+    fontSize: 15,
+    fontWeight: 400,
+    color: '#A9A9A9',
   },
 });
 

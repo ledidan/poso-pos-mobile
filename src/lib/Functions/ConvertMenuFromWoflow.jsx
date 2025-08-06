@@ -78,7 +78,7 @@ const _convertItems = ({ categoryDescription = "", items = [] }) =>
           itemDescription: description,
           itemIsOutOfStock: { false: "checked" },
           itemName: number ? `${number}. ${name}` : name,
-          itemNote: categoryDescription,
+          itemNote: categoryDescription || "",
           itemPrice: price ? parseFloat(`${price}e-2`) : "",
           modifierGroups: _common(convertedModifierGroups),
           tags,

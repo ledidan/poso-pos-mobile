@@ -178,6 +178,18 @@ const SanitizeItemInfoBeforeSubmit = (itemInfo = {}) => {
   return sanitizedItemInfo;
 };
 
+const SanitizeItemInfoBeforeSubmitNew = (itemInfo = {}) => {
+  const sanitizedItemInfo = {
+    itemName: itemInfo.itemName || "",
+    itemPrice: itemInfo.itemPrice || "",
+    itemNote: itemInfo.itemNote || "",
+    itemIsArchived: itemInfo.itemIsArchived || { false: "checked" },
+    modifierGroups: itemInfo.modifierGroups,
+    itemImages: itemInfo.itemImages || { full: { imageUrl: "" } },
+  };
+  return sanitizedItemInfo;
+};
+
 // -------------------------------------------------------------------
 // Sort categories by name in alphabetical order by default
 // Then sort the categories by its index in list
@@ -212,6 +224,7 @@ export default {
   // GetTextDescriptionForOrder,
   rankSectionOptions,
   SanitizeItemInfoBeforeSubmit,
+  SanitizeItemInfoBeforeSubmitNew,
   SortMenuCategories,
   SortMenuItems,
 };

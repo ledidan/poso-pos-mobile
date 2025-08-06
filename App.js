@@ -9,6 +9,8 @@ import { useAuth } from "./src/context/AuthContext";
 import LoadingDialog from "./src/components/modals/LoadingDialog";
 import AuthNavigator from "./src/navigation/AuthNavigator";
 import { MenuProvider } from "react-native-popup-menu";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 export default function App() {
   // const { userToken, isLoading } = useAuth();
@@ -43,14 +45,16 @@ export default function App() {
   // }
 
   return (
-    <ThemeProvider theme={theme}>
-      <NavigationContainer>
-        {/* {userToken ? <StackNavigator /> : <AuthNavigator />} */}
-        <MenuProvider>
-          {<StackNavigator />}
-        </MenuProvider>
-        <Toast config={toastConfig} />
-      </NavigationContainer>
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <BottomSheetModalProvider>
+        <ThemeProvider theme={theme}>
+          <NavigationContainer>
+            <MenuProvider>{<StackNavigator />}</MenuProvider>
+            <Toast config={toastConfig} />
+            {/* {userToken ? <StackNavigator /> : <AuthNavigator />} */}
+          </NavigationContainer>
+        </ThemeProvider>
+      </BottomSheetModalProvider>
+    </GestureHandlerRootView>
   );
 }

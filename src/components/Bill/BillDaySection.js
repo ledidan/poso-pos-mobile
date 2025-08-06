@@ -3,7 +3,12 @@ import { View, Text, StyleSheet } from "react-native";
 import BillCard from "../Bill/BillCard";
 import dayjs from "dayjs";
 
-const BillDaySection = ({ day = {}, index = 0 }) => {
+const BillDaySection = ({
+  day = {},
+  index = 0,
+  onSubmitChangeOrder = () => {},
+  onSubmitCloseOrder = () => {},
+}) => {
   return (
     <View style={styles.container}>
       <View style={styles.dateRow}>
@@ -16,7 +21,11 @@ const BillDaySection = ({ day = {}, index = 0 }) => {
         </Text>
       </View>
       {/* {day.map((bill, idx) => ( */}
-      <BillCard bill={day} />
+      <BillCard
+        bill={day}
+        onSubmitChangeOrder={onSubmitChangeOrder}
+        onSubmitCloseOrder={onSubmitCloseOrder}
+      />
       {/* ))} */}
     </View>
   );

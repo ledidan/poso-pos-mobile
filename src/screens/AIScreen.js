@@ -6,7 +6,7 @@ import { DismissActionProvider } from "../context/DismissActionContext";
 
 const AIScreen = () => {
   const { GetShopAllItems } = Merchants.GetRequests;
-  const [menus, setMenus] = useState();
+  const [menus, setMenus] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const shopID = "109879f";
@@ -16,7 +16,8 @@ const AIScreen = () => {
         shopID,
       });
       if (allItems) {
-        setMenus(allItems);
+        const converted = HelperFunctions._convertFlatMenu(allItems);
+        setMenus(converted);
       }
     } catch (e) {
       setError(e);
@@ -44,7 +45,7 @@ const AIScreen = () => {
   return (
     <DismissActionProvider>
       <AIPOS
-        menus={HelperFunctions._convertFlatMenu(menus)}
+        menus={menus}
         refetch={getMenusForShop}
         shopID={shopID}
         loading={loading}

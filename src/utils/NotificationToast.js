@@ -10,7 +10,7 @@ const success = (title, message) => {
     type: 'success',
     text1: title,
     text2: message,
-    visibilityTime: 3000,
+    visibilityTime: 1000,
   });
 };
 
@@ -24,7 +24,7 @@ const error = (title, message) => {
     type: 'error',
     text1: title,
     text2: message,
-    visibilityTime: 4000,
+    visibilityTime: 2000,
   });
 };
 
@@ -38,7 +38,7 @@ const info = (title, message) => {
     type: 'info',
     text1: title,
     text2: message,
-    visibilityTime: 3000,
+    visibilityTime: 2000,
   });
 };
 
