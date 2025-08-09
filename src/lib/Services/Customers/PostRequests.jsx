@@ -172,6 +172,19 @@ const SaveCustomerPhoneNumbers = (params) =>
       .catch(() => resolve({ success: false }));
   });
 
+// -----------------------------------------------------------------------
+// Generate a bill for a shop
+
+const GenerateBill = (params) =>
+  new Promise((resolve, reject) => {
+    if (!params.shopID || !params.amount || !params.orderID || !params.bankConnectionInfo)
+      return reject("(GenerateBill) Parameters are not sufficient.");
+    axios
+      .post(API_PATHS.GENERATE_BILL, params)
+      .then(({ data }) => resolve({ success: true, qrCode: data.qrcode }))
+      .catch(() => resolve({ success: false }));
+  });
+
 export default {
   AddOrderToCustomerPastOrders,
   AddOrderToShopActiveOrders,
@@ -183,4 +196,5 @@ export default {
   DetachPaymentMethodFromCustomer,
   InitializeStripeCheckout,
   SaveCustomerPhoneNumbers,
+  GenerateBill,
 };

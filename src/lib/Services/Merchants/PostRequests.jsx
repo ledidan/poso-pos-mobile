@@ -744,6 +744,19 @@ const ChangeTableStatus = (params) =>
       .catch(() => resolve({ success: false }));
   });
 
+// -----------------------------------------------------------------------
+// Add bank info
+
+const SaveBankConnectInfo = (params) =>
+  new Promise((resolve, reject) => {
+    if (!params.shopID)
+      return reject("(SaveBankConnectInfo) Parameters are not sufficient.");
+    axios
+      .post(API_PATHS.SAVE_BANK_CONNECT_INFO, params)
+      .then(() => resolve({ success: true }))
+      .catch(() => resolve({ success: false }));
+  });
+
 export default {
   AddGroupToMenu,
   AddTable,
@@ -799,4 +812,5 @@ export default {
   SendExportPayoutToMail,
   SubmitOnlineOrderingAgreement,
   ChangeTableStatus,
+  SaveBankConnectInfo,
 };

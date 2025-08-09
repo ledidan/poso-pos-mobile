@@ -5,30 +5,54 @@ import {
   TouchableOpacity,
   StyleSheet,
   Keyboard,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { InputFunctions } from "../RegexInputFunctions";
-// import VoiceInput from "../ui/VoiceInput";
+import VoiceInput from "../ui/VoiceInput";
 
-const InputBar = ({ value, onChange, onTogglePanel, onSend, isPanelOpen, menus }) => {
-  const [parsedInput, setParsedInput] = useState({});
+const InputBar = ({
+  value,
+  onChange,
+  onTogglePanel,
+  onSend,
+  isPanelOpen,
+  menus,
+}) => {
+  const [parsedInput, setParsedInput] = useState(null);
   const allProducts = useMemo(() => {
     if (!menus || typeof menus !== "object") return [];
-  
+
     return Object.entries(menus).map(([itemID, item]) => ({
       ...item,
-      itemID, 
+      itemID,
     }));
   }, [menus]);
   const handleChange = (text) => {
-    const parsed = InputFunctions.parseInputWithMenu(text, allProducts);
-    setParsedInput(parsed);
+    if (text) {
+      const parsed = InputFunctions.parseInputWithMenu(text, allProducts);
+      setParsedInput(parsed);
+    } else {
+      setParsedInput(null);
+    }
     onChange(text);
   };
 
   const handleSend = () => {
-    console.log("parsedInput", JSON.stringify(parsedInput, null, 2));
+    if (!parsedInput) return;
+    // console.log("Sending parsedInput:", JSON.stringify(parsedInput, null, 2));
+
+    if (!parsedInput.itemName || parsedInput.itemPrice === null) {
+      Alert.alert(
+        "Yêu cầu không hợp lệ",
+        "Vui lòng nhập đầy đủ tên món và giá tiền.",
+        [{ text: "OK" }]
+      );
+      return;
+    }
     onSend(parsedInput);
+    onChange(""); 
+    setParsedInput(null);
   };
 
   return (

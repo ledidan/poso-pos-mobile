@@ -6,25 +6,83 @@ import {
   SafeAreaView,
   TouchableOpacity,
   TextInput,
-  Image,
   ScrollView,
+  Linking,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
+import System from "../lib/Services/System";
+import { useAuth } from "../context/AuthContext";
+import NotificationToast from "../utils/NotificationToast";
+import LoadingDialog from "../components/modals/LoadingDialog";
 
 const LoginByPhoneScreen = ({ navigation }) => {
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
+  const { signIn = () => {} } = useAuth() || {};
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState({
+    phoneNumber: "",
+    password: "",
+  });
 
-  const handleContinue = () => {
-    // Chuyển sang màn hình OTP và gửi kèm số điện thoại
-    // navigation.navigate("Otp", { phone: phoneNumber });
+  const onLogin = async () => {
+    setLoading(true);
+
+    if (!phoneNumber) {
+      setErrorMessage({
+        ...errorMessage,
+        phoneNumber: "Vui lòng nhập số điện thoại",
+      });
+      setLoading(false);
+      return;
+    }
+    if (!password) {
+      setErrorMessage({ ...errorMessage, password: "Vui lòng nhập mật khẩu" });
+      setLoading(false);
+      return;
+    }
+    const {
+      data = {},
+      success,
+      error,
+    } = await System.PostRequests.LoginShop({
+      mobileNumber: phoneNumber,
+      password,
+    });
+
+    if (success && data.shopID) {
+      const { shopID = "", personnelID = "" } = data;
+      signIn({
+        shopID,
+        userData: { phoneNumber, personalID: personnelID },
+      });
+      NotificationToast.success("Đăng nhập thành công");
+      setLoading(false);
+      setErrorMessage({
+        phoneNumber: "",
+        password: "",
+      });
+      setLoading(false);
+    } else {
+      console.log("error", error);
+      const { mobileNumber, password } = error.response.data || {};
+      if (mobileNumber) {
+        setErrorMessage({ ...errorMessage, phoneNumber: mobileNumber });
+      }
+      if (password) {
+        setErrorMessage({ ...errorMessage, password });
+      }
+      setLoading(false);
+      NotificationToast.error(mobileNumber || password);
+    }
   };
-
   return (
     <SafeAreaView style={styles.container}>
-      {/* <DialogLoading isVisible={true} /> */}
+      <LoadingDialog isVisible={loading} />
       {/* Header */}
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <TouchableOpacity style={styles.header}>
+        <TouchableOpacity style={styles.header} onPress={() => Linking.openURL("tel:+84977140536")}>
           <Text style={styles.headerText}>Hỗ trợ</Text>
           <Ionicons name="headset-outline" size={24} color="black" />
         </TouchableOpacity>
@@ -33,7 +91,10 @@ const LoginByPhoneScreen = ({ navigation }) => {
         <View style={styles.body}>
           <Image
             source={require("../../assets/AppIcons/poso-logo-black-text.png")}
+            contentFit="contain"
             style={styles.logo}
+            placeholder={require("../../assets/AppIcons/appstore.png")}
+            transition={500}
           />
           <Text style={styles.title}>
             Nhập số điện thoại cửa hàng để bắt đầu
@@ -45,9 +106,34 @@ const LoginByPhoneScreen = ({ navigation }) => {
             type="number"
             value={phoneNumber}
             onChangeText={setPhoneNumber}
+            onBlur={() => setErrorMessage({ ...errorMessage, phoneNumber: "" })}
           />
-          <TouchableOpacity style={styles.button} onPress={handleContinue}>
-            <Text style={styles.buttonText}>Tiếp tục</Text>
+          {errorMessage.phoneNumber && (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{errorMessage.phoneNumber}</Text>
+            </View>
+          )}
+          <TextInput
+            style={styles.input}
+            placeholder="Nhập mật khẩu"
+            keyboardType="default"
+            type="text"
+            value={password}
+            onChangeText={setPassword}
+            onBlur={() => setErrorMessage({ ...errorMessage, password: "" })}
+            secureTextEntry={true}
+          />
+          {errorMessage.password && (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{errorMessage.password}</Text>
+            </View>
+          )}
+          <TouchableOpacity
+            style={styles.button}
+            onPress={onLogin}
+            disabled={loading}
+          >
+            <Text style={styles.buttonText}>Đăng nhập</Text>
           </TouchableOpacity>
           <View style={styles.registerContainer}>
             <Text style={styles.registerText}>Bạn chưa sử dụng Poso? </Text>
@@ -65,6 +151,9 @@ const LoginByPhoneScreen = ({ navigation }) => {
           <Image
             source={require("../../assets/AppIcons/brand/poso.png")}
             style={styles.posoLogo}
+            contentFit="contain"
+            placeholder={require("../../assets/AppIcons/appstore.png")}
+            transition={500}
           />
         </View>
       </ScrollView>
@@ -122,6 +211,17 @@ const styles = StyleSheet.create({
   },
   footerText: { color: "#888", fontWeight: 400 },
   posoLogo: { width: 70, height: 80, resizeMode: "contain" },
+  errorText: {
+    color: "red",
+    fontSize: 12,
+    fontWeight: 500,
+    marginLeft: 10,
+  },
+  errorContainer: {
+    width: "100%",
+    alignItems: "flex-start",
+    marginBottom: 16,
+  },
 });
 
 export default LoginByPhoneScreen;

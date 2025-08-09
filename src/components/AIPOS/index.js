@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { View, TouchableWithoutFeedback, Keyboard } from "react-native";
+import {
+  View,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Linking,
+} from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useCartStore } from "../../lib/stores/cartStore";
 import Customers from "../../lib/Services/Customers";
 import Merchants from "../../lib/Services/Merchants";
+import System from "../../lib/Services/System";
 import { _initializeDetailsOfItemInCart } from "../../lib/Functions/OrderFormat";
 import NotificationToast from "../../utils/NotificationToast";
 import CartList from "./Cart/CartList";
@@ -13,23 +19,26 @@ import CartModals from "./Cart/CartModals";
 import CartTotal from "./Cart/CartTotal";
 import _isEmpty from "lodash.isempty";
 import { useDismissAction } from "../../context/DismissActionContext";
-import LoadingDialog from "../modals/LoadingDialog";
+import UpgradeDialog from "../ui/UpgradeDialog";
 
 const AIPOS = ({
   menus = {},
   shopID,
-  loading = false,
-  error = null,
   refetch = () => {},
+  refetchShopInfo = () => {},
+  shopBasicInfo = {},
 }) => {
+  const { subscriptionInfo = {} } = shopBasicInfo;
+  const { packageInfo = {} } = subscriptionInfo;
   // navigation
   const { CreateNewItem, SaveChangedItemInfo } = Merchants.PostRequests;
+  const { ChangeShopOrderLimit } = System.PostRequests;
   const navigation = useNavigation();
   const { bill = {} } = useRoute().params || {};
   const [showPanel, setShowPanel] = useState(false);
   const [initialCart, setInitialCart] = useState([]);
   const [input, setInput] = useState("");
-
+  const [isDialogVisible, setIsDialogVisible] = useState(false);
   const {
     orderItems: cart,
     addItem,
@@ -118,10 +127,14 @@ const AIPOS = ({
       NotificationToast.success("Cập nhật đơn hàng thành công");
     } else {
       NotificationToast.success("Đặt hàng thành công");
+      // cập nhật remainingOrders trong subscriptionInfo
+      await ChangeShopOrderLimit({ shopID });
+      refetchShopInfo();
     }
     clearCart();
-    navigation.navigate("BillScreen", {
+    navigation.navigate("MainTabNavigator", {
       orderID: orderID,
+      screen: "Bill",
     });
   };
 
@@ -145,6 +158,14 @@ const AIPOS = ({
         "Thông tin chưa đầy đủ",
         "Vui lòng thêm sản phẩm để đặt hàng"
       );
+      return;
+    }
+    // check if remainingOrders is less than 0
+    if (packageInfo.remainingOrders <= 0) {
+      // NotificationToast.error(
+      //   "Bạn đã hết lượt đặt hàng, vui lòng mua gói để tiếp tục sử dụng"
+      // );
+      setIsDialogVisible(true);
       return;
     }
     try {
@@ -253,7 +274,6 @@ const AIPOS = ({
     const sanitizedItemInfo = {
       ...itemInfo,
       itemImages: itemInfo.itemImages || { full: { imageUrl: "" } },
-      itemIsArchived: itemInfo.itemIsArchived || { false: "checked" },
       modifierGroups: itemInfo.modifierGroups || [],
     };
     const res = await (showEditModal
@@ -280,6 +300,7 @@ const AIPOS = ({
     } catch (error) {
       NotificationToast.error("Lỗi khi lưu sản phẩm");
     } finally {
+      refetch();
       updateOrderHandler({
         isSavingItem: false,
       });
@@ -297,8 +318,20 @@ const AIPOS = ({
     }
   };
 
+  const handleCloseDialog = () => {
+    setIsDialogVisible(false);
+  };
 
-  console.log("menus", JSON.stringify(menus, null, 2));
+  const handleUpgrade = () => {
+    navigation.navigate("ServicePackages");
+    handleCloseDialog();
+  };
+
+  const handleContact = () => {
+    Linking.openURL("tel:+84977140536");
+    handleCloseDialog();
+  };
+
   return (
     <TouchableWithoutFeedback onPress={dismissAllActions}>
       <View style={{ flex: 1, backgroundColor: "#FFF" }}>
@@ -309,6 +342,12 @@ const AIPOS = ({
     orderHandler?.isCreatingItem
           }
         /> */}
+        <UpgradeDialog
+          visible={isDialogVisible}
+          onClose={handleCloseDialog}
+          onUpgrade={handleUpgrade}
+          onContact={handleContact}
+        />
         <CartModals
           editItem={editItem}
           showEditModal={showEditModal}

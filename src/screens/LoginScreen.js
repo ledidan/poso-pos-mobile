@@ -19,7 +19,7 @@ export default function LoginScreen({ navigation }) {
 
   const handleLogin = () => {
     if (email === "phu159123@gmail.com" && password === "1234") {
-      navigation.replace("Home");
+      navigation.replace("MainTabNavigator");
     } else {
       alert("Sai tài khoản hoặc mật khẩu");
     }

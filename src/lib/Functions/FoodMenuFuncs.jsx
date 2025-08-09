@@ -173,7 +173,12 @@ const SanitizeItemInfoBeforeSubmit = (itemInfo = {}) => {
     {}
   );
   sanitizedItemInfo.itemImages = itemInfo.itemImages || {};
-  sanitizedItemInfo.itemIsArchived = itemInfo.itemIsArchived;
+  sanitizedItemInfo.itemIsOutOfStock = itemInfo.itemIsOutOfStock || {
+    false: "checked",
+  };
+  sanitizedItemInfo.itemIsOnSale = itemInfo.itemIsOnSale || {
+    false: "checked",
+  };
   sanitizedItemInfo.modifierGroups = itemInfo.modifierGroups;
   return sanitizedItemInfo;
 };
@@ -183,7 +188,8 @@ const SanitizeItemInfoBeforeSubmitNew = (itemInfo = {}) => {
     itemName: itemInfo.itemName || "",
     itemPrice: itemInfo.itemPrice || "",
     itemNote: itemInfo.itemNote || "",
-    itemIsArchived: itemInfo.itemIsArchived || { false: "checked" },
+    itemIsOutOfStock: itemInfo.itemIsOutOfStock || { false: "checked" },
+    itemIsOnSale: itemInfo.itemIsOnSale || { false: "checked" },
     modifierGroups: itemInfo.modifierGroups,
     itemImages: itemInfo.itemImages || { full: { imageUrl: "" } },
   };

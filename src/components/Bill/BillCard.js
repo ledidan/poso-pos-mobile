@@ -15,6 +15,7 @@ const BillCard = ({
   index = 0,
   onSubmitChangeOrder = () => {},
   onSubmitCloseOrder = () => {},
+  onSubmitGenerateBill = () => {},
 }) => {
   const navigate = useNavigation();
   return (
@@ -109,7 +110,15 @@ const BillCard = ({
           </MenuOptions>
         </Menu>
         {bill.isPaid === false && (
-          <TouchableOpacity style={styles.row}>
+          <TouchableOpacity
+            style={styles.row}
+            onPress={() =>
+              onSubmitGenerateBill({
+                orderID: bill.orderID,
+                amount: bill.total,
+              })
+            }
+          >
             <Ionicons name="qr-code-outline" size={20} color="#777" />
             <Text style={styles.optionText}>Mã QR</Text>
           </TouchableOpacity>

@@ -1,4 +1,6 @@
-const menuList = ["phở", "hủ tiếu", "bún bò", "trà đá", "cà phê"];
+import dayjs from "dayjs";
+
+// const menuList = ["phở", "hủ tiếu", "bún bò", "trà đá", "cà phê"];
 const quantityUnitList = ["ly", "cốc", "chai", "lon", "bát", "phần", "món"];
 const priceUnitList = [
   "k",
@@ -44,6 +46,20 @@ class InputFunctions {
   static _removeVietnameseAccents(text) {
     return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   }
+  static _formatVietnameseString(str) {
+    if (typeof str !== "string") {
+      return "";
+    }
+
+    const noAccentStr = str
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/đ/gi, "d");
+
+    const formattedStr = noAccentStr.toUpperCase();
+
+    return formattedStr;
+  }
   static _normalizeText(text) {
     return text
       .normalize("NFD")
@@ -51,15 +67,14 @@ class InputFunctions {
       .toLowerCase()
       .trim();
   }
+
   static extractPrice(input) {
     let text = input.trim();
     let price = null;
-
     const match = [...text.matchAll(priceRegex)].pop();
 
     if (match) {
       let [fullMatch, numberStr, unit] = match;
-
       numberStr = numberStr.replace(",", ".");
       let number = parseFloat(numberStr);
       let multiplier = 1;
@@ -94,6 +109,7 @@ class InputFunctions {
       price = Math.round(number * multiplier);
       text = text.replace(fullMatch, "").trim();
     }
+
     return { price, text };
   }
 
@@ -104,13 +120,19 @@ class InputFunctions {
     const text = input.replace(note, "").trim();
     return { note, text };
   }
-  static detectItemName(text, menuList) {
-    const normText = this._removeVietnameseAccents(text.toLowerCase());
-    const matched = menuList.find((item) =>
-      normText.includes(this._removeVietnameseAccents(item.toLowerCase()))
+
+  static detectItemName(text, dynamicMenuList) {
+    const normText = this._normalizeText(text);
+    if (!normText) return null;
+
+    const sortedMenu = [...dynamicMenuList].sort((a, b) => b.length - a.length);
+
+    const matched = sortedMenu.find((item) =>
+      normText.includes(this._normalizeText(item))
     );
-    return matched;
+    return matched || null;
   }
+
   static extractNoteAndCustomer(input) {
     let note = null;
     let customerName = null;
@@ -128,6 +150,7 @@ class InputFunctions {
 
     return { note: note || null, customerName: customerName || "" };
   }
+
   static extractQuantity(input) {
     const match = input.match(quantityRegex);
     if (!match) return { quantity: 1, text: input };
@@ -146,6 +169,7 @@ class InputFunctions {
 
     return { quantity, unit, text };
   }
+
   static extractSize(text) {
     const regex = new RegExp(`\\b(${sizeKeywords.join("|")})\\b`, "i");
     const match = text.match(regex);
@@ -156,6 +180,7 @@ class InputFunctions {
     }
     return { size: null, text };
   }
+
   static extractCustomerName(originalText, itemName) {
     if (!itemName) return "";
 
@@ -172,10 +197,12 @@ class InputFunctions {
       originalText.slice(startIndex + itemName.length);
     return remaining.trim() || "";
   }
+
   static _capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
-  static parseInput(inputRaw) {
+
+  static parseInput(inputRaw, dynamicMenuList) {
     let input = inputRaw.trim();
 
     const {
@@ -186,18 +213,15 @@ class InputFunctions {
 
     const { price, text: afterPrice } = this.extractPrice(afterQuantity);
 
-    const itemName = this.detectItemName(afterPrice, menuList);
-    let cleanItemName = itemName ? itemName.replace(/\s+/g, " ").trim() : "";
-    const textWithoutItem =
-      cleanItemName && afterPrice
-        ? afterPrice.replace(new RegExp(cleanItemName, "i"), "").trim()
-        : afterPrice;
-
-    const { note, customerName } = this.extractNoteAndCustomer(textWithoutItem);
+    const { note, customerName } = this.extractNoteAndCustomer(afterPrice);
     const cleanNote = note ? note.replace(/\s+/g, " ").trim() : "";
     const cleanCustomerName = customerName
       ? customerName.replace(/\s+/g, " ").trim()
       : "";
+
+    const remainingText = afterPrice.replace(note || "", "").trim();
+    const itemName = this.detectItemName(remainingText, dynamicMenuList);
+    const cleanItemName = itemName ? itemName.replace(/\s+/g, " ").trim() : "";
 
     return {
       itemName: this._capitalize(cleanItemName),
@@ -208,31 +232,69 @@ class InputFunctions {
       customerName: cleanCustomerName,
     };
   }
+
   static parseInputWithMenu(inputRaw, menusFromDB) {
-    const parsed = this.parseInput(inputRaw);
-    const { itemName } = parsed;
+    const dynamicMenuList = menusFromDB.map((menu) => menu.itemName);
+    let input = inputRaw.trim();
 
-    if (!itemName) {
-      return { ...parsed, matchedMenu: null, isNewItem: true };
-    }
+    const {
+      quantity,
+      unit,
+      text: afterQuantity,
+    } = this.extractQuantityAndUnit(input);
+    const { price, text: afterPrice } = this.extractPrice(afterQuantity);
 
-    const matchedMenu = menusFromDB.find(
-        (menu) => this._removeVietnameseAccents(menu.itemName) === this._removeVietnameseAccents(itemName)
+    const { note, customerName } = this.extractNoteAndCustomer(afterPrice);
+    const textAfterNote = afterPrice.replace(note || "", "").trim();
+
+    const normText = this._normalizeText(textAfterNote);
+    const sortedMenu = [...dynamicMenuList].sort((a, b) => b.length - a.length);
+    const matchedItem = sortedMenu.find((menuName) =>
+      normText.includes(this._normalizeText(menuName))
     );
 
-    if (matchedMenu) {
-      return {
-        ...parsed,
-        itemID: matchedMenu.itemID,
-        matchedMenu,
-        isNewItem: false,
-      };
+    let itemNote = note?.trim() || "";
+    let itemName = "";
+    let matchedMenu = null;
+
+    if (matchedItem) {
+      itemName = matchedItem;
+      matchedMenu = menusFromDB.find(
+        (menu) =>
+          this._normalizeText(menu.itemName) ===
+          this._normalizeText(matchedItem)
+      );
+
+      const rawNote = textAfterNote
+        .replace(new RegExp(matchedItem, "i"), "")
+        .trim();
+      if (!itemNote && rawNote.length > 0) {
+        itemNote = rawNote;
+      }
+    } else {
+      itemName = textAfterNote;
     }
 
+    let cleanItemName = itemName.trim();
+    if (!cleanItemName && !matchedMenu) {
+      cleanItemName = itemNote.trim();
+      itemNote = null;
+    }
+    cleanItemName = this._capitalize(cleanItemName);
+    const cleanNote = itemNote?.trim().replace(/\s+/g, " ") || null;
+    const cleanCustomer = customerName.trim().replace(/\s+/g, " ");
+    const itemID = matchedMenu?.itemID || dayjs().unix();
+
     return {
-      ...parsed,
-      matchedMenu: null,
-      isNewItem: true,
+      itemID,
+      itemName: cleanItemName,
+      itemPrice: price || matchedMenu?.itemPrice || null,
+      itemQuantity: quantity,
+      itemUnit: unit || null,
+      itemNote: cleanNote || null,
+      customerName: cleanCustomer || "",
+      matchedMenu: matchedMenu || null,
+      isNewItem: !matchedMenu,
     };
   }
 }

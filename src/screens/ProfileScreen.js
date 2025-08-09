@@ -1,10 +1,12 @@
 // screens/ProfileScreen.js
 import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
+import { useAuth } from '../context/AuthContext';
 
-export default function ProfileScreen({ navigation }) {
+export default function ProfileScreen() {
+  const { signOut = () => {} } = useAuth() || {};
   const handleLogout = () => {
-    navigation.replace('Login');
+    signOut();
   };
 
   return (
@@ -16,6 +18,6 @@ export default function ProfileScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  title: { fontSize: 20, marginBottom: 20, fontWeight: 'bold' },
+  container: { flex: 1, justifyContent: "center", alignItems: "center" },
+  title: { fontSize: 20, marginBottom: 20, fontWeight: "bold" },
 });

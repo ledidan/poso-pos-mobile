@@ -1,10 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { BaseToast, ErrorToast } from "react-native-toast-message";
+import { BaseToast, ErrorToast, InfoToast } from "react-native-toast-message";
 
 const successColor = "#009048";
 const errorColor = "#eb2504";
-
+const infoColor = "#007AFF";
 export const toastConfig = {
   /*
     Ghi đè component 'success'. 
@@ -64,6 +64,35 @@ export const toastConfig = {
           size={25}
           color={errorColor}
           style={{ marginLeft: 15 }}
+        />
+      )}
+    />
+  ),
+  info: (props) => (
+    <InfoToast
+      {...props}
+      style={{
+        borderLeftColor: infoColor,
+        marginTop: 30,
+        flexDirection: "row",
+        alignItems: "center",
+      }}
+      contentContainerStyle={{ paddingHorizontal: 10 }}
+      text1Style={{
+        fontSize: 12,
+        fontWeight: "bold",
+        color: infoColor,
+      }}
+      text2Style={{
+        fontSize: 12,
+        color: infoColor,
+      }}
+      renderLeadingIcon={() => (
+        <Ionicons
+          name="information-circle"
+          size={25}
+          color={infoColor}
+          style={{ marginLeft: 10 }}
         />
       )}
     />

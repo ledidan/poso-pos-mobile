@@ -1,42 +1,38 @@
-import React from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { Overlay } from '@rneui/themed';
+import React from "react";
+import { StyleSheet } from "react-native";
+import { Portal, Dialog, ActivityIndicator, Text } from "react-native-paper";
 
 const LoadingDialog = ({ isVisible }) => {
   return (
-    <Overlay 
-      isVisible={isVisible} 
-      overlayStyle={styles.overlay}
-      backdropStyle={styles.backdrop}
-    >
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#007AFF" />
-        {/* <Text style={styles.text}>{text}</Text> */}
-      </View>
-    </Overlay>
+    <Portal>
+      <Dialog visible={isVisible} dismissable={false} style={styles.dialog}>
+        <Dialog.Content style={styles.content}>
+          <ActivityIndicator size="small" color="#007AFF" />
+          {/* {text && <Text style={styles.text}>{text}</Text>} */}
+        </Dialog.Content>
+      </Dialog>
+    </Portal>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    padding: 20,
+  dialog: {
+    backgroundColor: "#FFFFFF",
     borderRadius: 12,
-    backgroundColor: '#FFFFFF',
-    width: 'auto',
-    maxWidth: '80%',
+    alignSelf: "center",
+    width: "auto",
   },
-  backdrop: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  content: {
+    flexDirection: "row",
+    alignItems: "center",
+    // paddingVertical: 20,
+    paddingHorizontal: 24,
   },
   text: {
-    marginLeft: 16,
+    marginLeft: 20,
     fontSize: 16,
-    color: '#333',
-    fontWeight: '500',
+    color: "#333",
+    fontWeight: "500",
   },
 });
 

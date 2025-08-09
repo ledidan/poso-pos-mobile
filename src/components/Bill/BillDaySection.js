@@ -8,6 +8,7 @@ const BillDaySection = ({
   index = 0,
   onSubmitChangeOrder = () => {},
   onSubmitCloseOrder = () => {},
+  onSubmitGenerateBill = () => {},
 }) => {
   return (
     <View style={styles.container}>
@@ -25,6 +26,7 @@ const BillDaySection = ({
         bill={day}
         onSubmitChangeOrder={onSubmitChangeOrder}
         onSubmitCloseOrder={onSubmitCloseOrder}
+        onSubmitGenerateBill={onSubmitGenerateBill}
       />
       {/* ))} */}
     </View>

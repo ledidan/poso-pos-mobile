@@ -16,10 +16,27 @@ import Merchants from "../../lib/Services/Merchants";
 import NotificationToast from "../../utils/NotificationToast";
 import dayjs from "dayjs";
 import { _initializeDetailsOfItemInCart } from "../../lib/Functions/OrderFormat";
+import ConfirmDialog from "../modals/ConfirmDialog";
+import QRCodeDialog from "../ui/QRDialog";
 
-const Bill = ({ bills, shopID, refetch = () => {} }) => {
+const Bill = ({
+  bills,
+  pastBills,
+  shopID,
+  refetch = () => {},
+  bankConnectionInfo = {},
+  activeTab = "active",
+  setActiveTab = () => {},
+}) => {
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
+  const [isConfirmAddBank, setIsConfirmAddBank] = useState(false);
+  const [isQRCodeDialogVisible, setIsQRCodeDialogVisible] = useState(false);
+  const [paymentInfo, setPaymentInfo] = useState({
+    qrCode: "",
+    amount: 0,
+  });
+  const { account_name = "" } = bankConnectionInfo;
 
   const getOrderItemsForOrderDetails = (orderDetails = {}) =>
     orderDetails.orderItems.map((cartItem) =>
@@ -109,9 +126,53 @@ const Bill = ({ bills, shopID, refetch = () => {} }) => {
     refetch();
     setRefreshing(false);
   }, []);
+
+  const handleGenerateBill = async ({ orderID = "", amount = 0 }) => {
+    const { success, qrCode } = await Customers.PostRequests.GenerateBill({
+      shopID,
+      amount,
+      orderID,
+      bankConnectionInfo,
+    });
+    if (success) {
+      setIsQRCodeDialogVisible(true);
+      setPaymentInfo({
+        qrCode,
+        amount,
+      });
+    } else {
+      setIsConfirmAddBank(true);
+    }
+  };
+
+  const handleConfirmAddBank = () => {
+    setIsConfirmAddBank(false);
+    navigation.navigate("BankSetup");
+  };
+
+  const handlePickDate = () => {
+    console.log("pick date");
+  };
+
   return (
     <View style={styles.container}>
       {/* Header */}
+      <ConfirmDialog
+        isVisible={isConfirmAddBank}
+        onConfirm={handleConfirmAddBank}
+        onClose={() => setIsConfirmAddBank(false)}
+        title="Bạn chưa có thông tin ngân hàng"
+        message="Bạn có muốn thêm thông tin ngân hàng không?"
+        confirmText="Thêm"
+        cancelText="Bỏ qua"
+      />
+      <QRCodeDialog
+        visible={isQRCodeDialogVisible}
+        onDismiss={() => setIsQRCodeDialogVisible(false)}
+        qrCodeUrl={paymentInfo.qrCode}
+        recipientName={account_name}
+        amount={paymentInfo.amount}
+      />
       <View style={styles.header}>
         <Text style={styles.title}>Hoá đơn</Text>
         <TouchableOpacity style={styles.guideBtn}>
@@ -119,21 +180,55 @@ const Bill = ({ bills, shopID, refetch = () => {} }) => {
           <Ionicons name="play-circle-outline" size={16} color="#007AFF" />
         </TouchableOpacity>
       </View>
-
+      {/* Tabs */}
+      <View style={styles.tabs}>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === "active" && styles.tabActive]}
+          onPress={() => setActiveTab("active")}
+        >
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === "active" && styles.tabTextActive,
+            ]}
+          >
+            Đơn mới
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === "past" && styles.tabActive]}
+          onPress={() => setActiveTab("past")}
+        >
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === "past" && styles.tabTextActive,
+            ]}
+          >
+            Đơn cũ
+          </Text>
+        </TouchableOpacity>
+        {activeTab === "past" && (
+          <TouchableOpacity onPress={handlePickDate} style={styles.filterBtn}>
+            <Ionicons name="calendar-outline" size={20} color="#007AFF" />
+          </TouchableOpacity>
+        )}
+      </View>
       <ScrollView
         style={{ flex: 1, backgroundColor: "#f3f3f3" }}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {bills.length > 0 ? (
-          bills.map((day, index) => (
+        {(activeTab === "active" ? bills : pastBills).length > 0 ? (
+          (activeTab === "active" ? bills : pastBills).map((day, index) => (
             <BillDaySection
               key={index}
               day={day}
               index={index}
               onSubmitChangeOrder={handleChangePaidOrder}
               onSubmitCloseOrder={handleCloseOrder}
+              onSubmitGenerateBill={handleGenerateBill}
             />
           ))
         ) : (
@@ -192,6 +287,45 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     elevation: 4,
+  },
+  // ** Tabs
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+
+  // Tabs container
+  tabs: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    gap: 20,
+    borderBottomColor: "#E5E7EB",
+    backgroundColor: "#fff",
+  },
+  tab: {
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderBottomWidth: 2,
+    borderBottomColor: "transparent",
+  },
+  tabActive: {
+    borderBottomColor: "#007AFF", // Màu active
+  },
+  tabText: {
+    fontSize: 16,
+    color: "#6B7280", // xám nhạt
+    fontWeight: "500",
+  },
+  tabTextActive: {
+    color: "#007AFF",
+    fontWeight: "600",
+  },
+
+  filterBtn: {
+    marginLeft: "auto",
+    padding: 8,
   },
 });
 export default Bill;
