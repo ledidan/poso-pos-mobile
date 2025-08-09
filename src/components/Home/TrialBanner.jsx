@@ -1,18 +1,20 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
-const TrialBanner = () => {
+const TrialBanner = ({onClose}) => {
+  const navigation = useNavigation();
   return (
     <View style={styles.trialBanner}>
       <View style={styles.trialBannerContent}>
         <Ionicons name="information-circle-outline" size={24} color="#00529B" />
         <Text style={styles.trialText}>Bạn đang ở Gói dùng thử. </Text>
-        <TouchableOpacity onPress={() => {}}>
+        <TouchableOpacity onPress={() => navigation.navigate("ServicePackages")}>
           <Text style={styles.trialLink}>Xem thêm gói</Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity onPress={() => {}}>
+      <TouchableOpacity onPress={onClose}>
         <Ionicons name="close-outline" size={30} color="#00529B" />
       </TouchableOpacity>
     </View>

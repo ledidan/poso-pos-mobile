@@ -3,13 +3,16 @@ import AIPOS from "../components/AIPOS";
 import Merchants from "../lib/Services/Merchants";
 import { HelperFunctions } from "../components/helperFunctions";
 import { DismissActionProvider } from "../context/DismissActionContext";
+import { useAuth } from "../context/AuthContext";
 
 const AIScreen = () => {
+  const { userToken = "", user = {}, refetch = () => {} } = useAuth() || {};
+  const shopID = userToken;
   const { GetShopAllItems } = Merchants.GetRequests;
   const [menus, setMenus] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const shopID = "109879f";
+
   const getMenusForShop = async () => {
     try {
       const { allItems = {} } = await GetShopAllItems({
@@ -41,15 +44,17 @@ const AIScreen = () => {
   //     </View>
   //   );
   // }
-  
+
   return (
     <DismissActionProvider>
       <AIPOS
         menus={menus}
         refetch={getMenusForShop}
+        refetchShopInfo={refetch}
         shopID={shopID}
         loading={loading}
         error={error}
+        shopBasicInfo={user}
       />
     </DismissActionProvider>
   );

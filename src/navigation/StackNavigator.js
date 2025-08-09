@@ -4,14 +4,16 @@ import BottomTabNavigator from "./BottomTabNavigator";
 import AIScreen from "../screens/AIScreen";
 import UserInformation from "../components/UserInformation";
 import BillScreen from "../screens/BillScreen";
+import ServicePackages from "../components/More/Screen/ServicePackages";
+import BankSetup from "../components/ui/BankSetup";
 
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
   return (
-    <Stack.Navigator initialRouteName="Home">
+    <Stack.Navigator initialRouteName="MainTabNavigator">
       <Stack.Screen
-        name="Home"
+        name="MainTabNavigator"
         component={BottomTabNavigator}
         options={{ headerShown: false }}
       />
@@ -21,13 +23,23 @@ export default function AppNavigator() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="BillScreen"
+        name="Bill"
         component={BillScreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, navigationBarHidden: false }}
       />
       <Stack.Screen
         name="UserInformation"
         component={UserInformation}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ServicePackages"
+        component={ServicePackages}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="BankSetup"
+        component={BankSetup}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

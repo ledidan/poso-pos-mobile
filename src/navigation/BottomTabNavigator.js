@@ -9,6 +9,7 @@ import QrScreen from "../screens/QrScreen";
 import AIScreen from "../screens/AIScreen";
 import CustomTabIcon from "../components/AIPOS/CustomTabIcon";
 import BillScreen from "../screens/BillScreen";
+import ProductsScreen from "../screens/ProductsScreen";
 
 const Tab = createBottomTabNavigator();
 const EmptyScreen = () => null;
@@ -47,7 +48,7 @@ export default function BottomTabNavigator() {
         }}
       />
 
-      <Tab.Screen
+      {/* <Tab.Screen
         name="QR"
         component={QrScreen}
         options={{
@@ -55,6 +56,20 @@ export default function BottomTabNavigator() {
           tabBarIcon: ({ color, size, focused }) => (
             <Ionicons
               name="qr-code-outline"
+              size={size}
+              color={focused ? "#ff800a" : "#505e70"}
+            />
+          ),
+        }}
+      /> */}
+      <Tab.Screen
+        name="Products"
+        component={ProductsScreen}
+        options={{
+          tabBarLabel: "Hàng hóa",
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name="pricetag-outline"
               size={size}
               color={focused ? "#ff800a" : "#505e70"}
             />

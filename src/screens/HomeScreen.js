@@ -25,11 +25,13 @@ import {
   getRevenueData,
   getTopSellingItems,
 } from "../components/Home/ReportAnalysis/functions";
+import { useAuth } from "../context/AuthContext";
 const HomeScreen = () => {
-  const shopID = "109879f";
+  const { userToken = "" } = useAuth() || {};
+  const shopID = userToken;
   const [selectedRange, setSelectedRange] = useState("Hôm nay");
   const [refreshing, setRefreshing] = useState(false);
-
+  const [showTrialBanner, setShowTrialBanner] = useState(true);
   const bottomSheetRef = useRef(null);
   const [bills, setBills] = useState([]);
   const [time, setTime] = useState({
@@ -67,7 +69,7 @@ const HomeScreen = () => {
   );
 
   const { chartData, initialScrollIndex } = useMemo(
-    () => getRevenueData(bills, selectedRange), 
+    () => getRevenueData(bills, selectedRange),
     [bills, selectedRange]
   );
 
@@ -91,7 +93,9 @@ const HomeScreen = () => {
   return (
     <View style={styles.container}>
       <Header selectedRange={selectedRange} onPressFilter={handleOpenFilter} />
-      <TrialBanner />
+      {showTrialBanner && (
+        <TrialBanner onClose={() => setShowTrialBanner(false)} />
+      )}
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollViewContent}
@@ -101,7 +105,10 @@ const HomeScreen = () => {
         }
       >
         <CardOverview data={cartOverview} />
-        <RevenueChart data={chartData} initialScrollIndex={initialScrollIndex} />
+        <RevenueChart
+          data={chartData}
+          initialScrollIndex={initialScrollIndex}
+        />
         <TopSelling topItems={topItems} />
       </ScrollView>
       <BottomSheet

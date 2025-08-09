@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import InputField from "../../ui/InputField";
-import { Dialog } from "@rneui/base";
 import NumberField from "../../ui/NumberField";
-
-const ProductModal = ({ isVisible, onClose, onSubmit, initialData = null , addItem}) => {
+import { Dialog, Portal } from "react-native-paper";
+const ProductModal = ({
+  isVisible,
+  onClose,
+  onSubmit,
+  initialData = null,
+  addItem,
+}) => {
   const [name, setName] = useState("");
   const [price, setPrice] = useState(0);
 
@@ -25,7 +30,7 @@ const ProductModal = ({ isVisible, onClose, onSubmit, initialData = null , addIt
       itemName: name,
       itemPrice: parseFloat(price),
     };
-    onSubmit(product)
+    onSubmit(product);
     handleClose();
   };
 
@@ -35,57 +40,62 @@ const ProductModal = ({ isVisible, onClose, onSubmit, initialData = null , addIt
     onClose();
   };
 
-  const isEdit = !!initialData  ;
+  const isEdit = !!initialData;
 
-  
   const handleSetPrice = (price) => {
     setPrice(price);
   };
   return (
-    <Dialog
-      isVisible={isVisible}
-      onBackdropPress={handleClose}
-      overlayStyle={{ padding: 0, width: "100%", backgroundColor: "none" }}
-    >
-      <View style={styles.modalContainer}>
-        <Text style={styles.title}>
-          {isEdit ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm"}
-        </Text>
+    <Portal>
+      <Dialog
+        visible={isVisible}
+        onDismiss={handleClose}
+        style={{
+          padding: 0,
+          backgroundColor: "none",
+          maxHeight: "100%",
+        }}
+      >
+        <View style={styles.modalContainer}>
+          <Text style={styles.title}>
+            {isEdit ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm"}
+          </Text>
 
-        <InputField
-          containerStyle={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-          inputStyle={{ width: "70%" }}
-          label="Tên sản phẩm"
-          placeholder="Nhập tên..."
-          value={name}
-          onChangeText={setName}
-        />
-        <NumberField
-          label="Giá bán"
-          type="price"
-          value={price}
-          onValueChange={handleSetPrice}
-          step={5000} 
-        />
-        <View style={styles.buttonRow}>
-          <TouchableOpacity style={styles.cancelBtn} onPress={handleClose}>
-            <Text style={styles.cancelText}>Huỷ</Text>
-          </TouchableOpacity>
+          <InputField
+            containerStyle={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+            inputStyle={{ width: "70%" }}
+            label="Tên sản phẩm"
+            placeholder="Nhập tên..."
+            value={name}
+            onChangeText={setName}
+          />
+          <NumberField
+            label="Giá bán"
+            type="price"
+            value={price}
+            onValueChange={handleSetPrice}
+            step={5000}
+          />
+          <View style={styles.buttonRow}>
+            <TouchableOpacity style={styles.cancelBtn} onPress={handleClose}>
+              <Text style={styles.cancelText}>Huỷ</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.saveBtn, !(name && price) && { opacity: 0.5 }]}
-            onPress={handleSave}
-            disabled={!(name && price)}
-          >
-            <Text style={styles.btnText}>{isEdit ? "Cập nhật" : "Lưu"}</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.saveBtn, !(name && price) && { opacity: 0.5 }]}
+              onPress={handleSave}
+              disabled={!(name && price)}
+            >
+              <Text style={styles.btnText}>{isEdit ? "Cập nhật" : "Lưu"}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    </Dialog>
+      </Dialog>
+    </Portal>
   );
 };
 
@@ -96,7 +106,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 20,
-    marginHorizontal: 20,
+    // marginHorizontal: 20,
   },
   title: {
     fontSize: 18,

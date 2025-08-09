@@ -566,7 +566,28 @@ const GetItemsByOrder = ({ orderID, shopID }) =>
   });
 
 // ---------------------------------------------------------------
+// Get all Vietnam banks
 
+const GetAllVietnamBanks = () =>
+  new Promise((resolve, reject) => {
+    axios
+      .get(API_PATHS.GET_ALL_VIETNAM_BANKS)
+      .then(({ data }) => resolve(data))
+      .catch(reject);
+  });
+
+// ---------------------------------------------------------------
+// Get the subscription info of a shop
+
+const GetShopSubscriptionInfo = ({ shopID }) =>
+  new Promise((resolve, reject) => {
+    if (!shopID)
+      return reject("(GetShopSubscriptionInfo) Parameters are not sufficient.");
+    axios
+      .get(API_PATHS.GET_SHOP_SUBSCRIPTION_INFO, { params: { shopID } })
+      .then(({ data }) => resolve(data))
+      .catch(reject);
+  });
 export default {
   GetTable,
   CheckIfItemsAreInStock,
@@ -605,4 +626,6 @@ export default {
   GetWebsiteInfo,
   VerifyPersonnelPin,
   GetItemsByOrder,
+  GetAllVietnamBanks,
+  GetShopSubscriptionInfo,
 };

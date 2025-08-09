@@ -137,6 +137,46 @@ const UploadImageToAws = (params) =>
       .catch(() => resolve({ success: false }));
   });
 
+const CreateNewShop = (params) =>
+  new Promise((resolve, reject) => {
+    if (!params.shopId || !params.newShopInfo)
+      return reject("(CreateNewShop) Parameters are not sufficient.");
+    axios
+      .post(API_PATHS.CREATE_NEW_SHOP, params)
+      .then(({ data }) => resolve({ shopId: data.shopId, success: true }))
+      .catch(() => resolve({ success: false }));
+  });
+
+const LoginShop = (params) =>
+  new Promise((resolve, reject) => {
+    if (!params.mobileNumber || !params.password)
+      return reject("(LoginShop) Parameters are not sufficient.");
+    axios
+      .post(API_PATHS.LOGIN, params)
+      .then(({ data }) => resolve({ data, success: true }))
+      .catch((error) => resolve({ success: false, error }));
+  });
+
+const ChangeShopOrderLimit = (params) =>
+  new Promise((resolve, reject) => {
+    if (!params.shopID)
+      return reject("(ChangeShopOrderLimit) Parameters are not sufficient.");
+    axios
+      .post(API_PATHS.CHANGE_SHOP_ORDER_LIMIT, params)
+      .then(() => resolve({ success: true }))
+      .catch(() => resolve({ success: false }));
+  });
+
+const SaveUserPassword = ({ mobileNumber, password }) =>
+  new Promise((resolve, reject) => {
+    if (!mobileNumber || !password)
+      return reject("(SaveUserPassword) Parameters are not sufficient.");
+    axios
+      .post(API_PATHS.SAVE_USER_PASSWORD, { mobileNumber, password })
+      .then(() => resolve({ success: true }))
+      .catch(() => resolve({ success: false }));
+  });
+
 export default {
   ChangeMenuGroupImage,
   ChangeMenuItemImage,
@@ -147,4 +187,8 @@ export default {
   SendTextMessage,
   SendEmail,
   UploadImageToAws,
-};
+  CreateNewShop,
+  LoginShop,
+  ChangeShopOrderLimit,
+  SaveUserPassword,
+  };

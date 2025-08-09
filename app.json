@@ -1,19 +1,19 @@
 {
   "expo": {
-    "name": "poso-note",
+    "name": "Poso",
     "slug": "poso-note",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/AppIcons/android/mipmap-hdpi/ic_launcher.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.poso.poso-note",
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
-        }
+        },
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "splash": {
@@ -26,7 +26,6 @@
         "foregroundImage": "./assets/AppIcons/android/mipmap-hdpi/ic_launcher.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
       "package": "com.ledidan.posonote"
     },
     "web": {
@@ -37,6 +36,16 @@
         "projectId": "660152c8-0f1e-40f0-ba41-30413ecec418"
       }
     },
+    "plugins": [
+      [
+        "@react-native-voice/voice",
+        {
+          "microphonePermission": "CUSTOM: Allow Poso to access the microphone",
+          "speechRecognitionPermission": "CUSTOM: Allow Poso to securely recognize user speech"
+        }
+      ],
+      "expo-font"
+    ],
     "owner": "ledidan"
   }
 }

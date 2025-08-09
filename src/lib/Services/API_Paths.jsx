@@ -1,7 +1,9 @@
 // Poso Reserved
 
-const BASE_URL = "http://192.168.1.8:8000";
-export const EXPO_PUBLIC_IMAGE_SOURCE = "https://posovn.s3.ap-southeast-1.amazonaws.com"
+export const BASE_URL = "https://server.poso.vn" || "http://192.168.1.8:8000";
+
+export const EXPO_PUBLIC_IMAGE_SOURCE =
+  "https://posovn.s3.ap-southeast-1.amazonaws.com";
 // -------------- BUTI METHODS --------------
 // GET METHODS
 const CONVERT_LOCAL_TIME_TO_UTC = `${BASE_URL}/convertLocalTimeToUTC`;
@@ -11,7 +13,6 @@ const GET_CUSTOMER_STRIPE_RECEIPT = `${BASE_URL}/customerStripeReceipt`;
 const GET_DOORDASH_DELIVERY_DETAILS = `${BASE_URL}/doordashDeliveryDetails`;
 const GET_TIME_RANGE = `${BASE_URL}/timeRange`;
 const SEARCH_SHOPS_FOR_MERCHANT_DASHBOARD = `${BASE_URL}/searchShopsForMerchantDashboard`;
-
 // POST METHODS
 const ADD_EMAIL_TO_MAILING_LIST = `${BASE_URL}/addEmail`;
 const CHANGE_MENU_GROUP_IMAGE = `${BASE_URL}/changeMenuGroupImage`;
@@ -23,7 +24,10 @@ const SAVE_MERCHANT_STRIPE_ACCOUNT_ID = `${BASE_URL}/saveMerchantStripeAccountID
 const SEND_TEXT_MESSAGE = `${BASE_URL}/sendTextMessage`;
 const SEND_EMAIL = `${BASE_URL}/sendEmail`;
 const UPLOAD_IMAGE_TO_AWS = `${BASE_URL}/uploadImageToAws`;
-
+const CREATE_NEW_SHOP = `${BASE_URL}/createShop`;
+const LOGIN = `${BASE_URL}/loginShop`;
+const CHANGE_SHOP_ORDER_LIMIT = `${BASE_URL}/changeShopOrderLimit`;
+const SAVE_USER_PASSWORD = `${BASE_URL}/saveChangeUserPassword`;
 // -------------- CUSTOMER METHODS --------------
 // GET METHODS
 const CREATE_UNIQUE_ID_FOR_CUSTOMER = `${BASE_URL}/customerUniqueID`;
@@ -45,6 +49,7 @@ const DETACH_PAYMENT_METHOD_FROM_CUSTOMER = `${BASE_URL}/detachPaymentMethodFrom
 const SENT_EXPORT_PAYOUT_TO_MAIL = `${BASE_URL}/sent_export_payout_to_mail`;
 const INITIALIZE_STRIPE_CHECKOUT = `${BASE_URL}/initializeStripeCheckout`;
 const SAVE_CUSTOMER_PHONE_NUMBERS = `${BASE_URL}/saveCustomerPhoneNumbers`;
+const GENERATE_BILL = `${BASE_URL}/generateQRFromOrder`;
 
 // -------------- MERCHANT METHODS --------------
 // GET METHODS
@@ -86,6 +91,8 @@ const VERIFY_PERSONNEL_PIN = `${BASE_URL}/verifyPersonnelPin`;
 const EXPORT_MENU_TO_PDF = `${BASE_URL}/exportMenuToPDF`;
 const EXPORT_MENU_TO_EXCEL = `${BASE_URL}/exportMenuToExcel`;
 const GET_ITEMS_BY_ORDER = `${BASE_URL}/getItemsByOrder`;
+const GET_ALL_VIETNAM_BANKS = `${BASE_URL}/allVietnamBankInfo`;
+const GET_SHOP_SUBSCRIPTION_INFO = `${BASE_URL}/shopSubscriptionInfo`;
 // POST METHODS
 const ADD_GROUP_TO_MENU = `${BASE_URL}/addGroupToMenu`;
 const ADD_TABLE = `${BASE_URL}/createNewTable`;
@@ -140,6 +147,7 @@ const SAVE_SPECIAL_HOURS = `${BASE_URL}/saveSpecialHours`;
 const SAVE_WEBSITE = `${BASE_URL}/saveWebsite`;
 const SUBMIT_ONLINE_ORDERING_FORM = `${BASE_URL}/submitOnlineOrderingAgreement`;
 const CHANGE_TABLE_STATUS = `${BASE_URL}/changeTableStatus`;
+const SAVE_BANK_CONNECT_INFO = `${BASE_URL}/saveBankConnectInfo`;
 export default {
   GET_TABLE,
   DELETE_TABLE,
@@ -258,6 +266,7 @@ export default {
   SAVE_PERSONNEL_INFO,
   SAVE_SPECIAL_HOURS,
   SAVE_WEBSITE,
+  SAVE_USER_PASSWORD,
   SEARCH_SHOPS_FOR_MERCHANT_DASHBOARD,
   SEND_TEXT_MESSAGE,
   SEND_EMAIL,
@@ -266,4 +275,11 @@ export default {
   VERIFY_PERSONNEL_PIN,
   CHANGE_TABLE_STATUS,
   GET_ITEMS_BY_ORDER,
+  GENERATE_BILL,
+  GET_ALL_VIETNAM_BANKS,
+  SAVE_BANK_CONNECT_INFO,
+  CREATE_NEW_SHOP,
+  LOGIN,
+  CHANGE_SHOP_ORDER_LIMIT,
+  GET_SHOP_SUBSCRIPTION_INFO,
 };

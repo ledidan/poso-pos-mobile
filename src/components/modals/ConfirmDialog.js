@@ -1,6 +1,6 @@
 import React from 'react';
-import { Text, StyleSheet, View } from 'react-native';
-import { Dialog } from '@rneui/themed';
+import { StyleSheet } from 'react-native';
+import { Dialog, Portal, Text, Button } from 'react-native-paper';
 
 const ConfirmDialog = ({
   isVisible,
@@ -13,73 +13,69 @@ const ConfirmDialog = ({
 }) => {
 
   const handleConfirm = () => {
-    onConfirm();
+    if (onConfirm) {
+      onConfirm();
+    }
     onClose();
   };
 
   return (
-    <Dialog
-      isVisible={isVisible}
-      onBackdropPress={onClose}
-      animationType="fade"
-      style={styles.dialog}
-      overlayStyle={{ borderRadius: 5, padding: 20 }}
-    >
-      <Dialog.Title titleStyle={styles.title} title={title} />
-      <Text style={styles.message}>{message}</Text>
-      <Dialog.Actions>
-        <View style={styles.actions}>
-          <Dialog.Button title={cancelText} onPress={onClose} buttonStyle={styles.cancelButton} titleStyle={styles.cancelText} />
-          <Dialog.Button title={confirmText} titleStyle={styles.confirmText} onPress={handleConfirm} buttonStyle={styles.confirmButton} />
-        </View>
-      </Dialog.Actions>
-    </Dialog>
+    <Portal>
+      <Dialog
+        visible={isVisible}
+        onDismiss={onClose}
+        style={styles.dialog}
+      >
+        <Dialog.Title style={styles.title}>{title}</Dialog.Title>
+        <Dialog.Content>
+          <Text variant="bodyMedium" style={styles.message}>{message}</Text>
+        </Dialog.Content>
+        <Dialog.Actions>
+          <Button
+            onPress={onClose}
+            textColor="black"
+            style={styles.button}
+            labelStyle={styles.buttonLabel}
+          >
+            {cancelText}
+          </Button>
+          <Button
+            onPress={handleConfirm}
+            mode="contained"
+            style={[styles.button, styles.confirmButton]}
+            labelStyle={styles.buttonLabel}
+          >
+            {confirmText}
+          </Button>
+        </Dialog.Actions>
+      </Dialog>
+    </Portal>
   );
 };
 
 const styles = StyleSheet.create({
   dialog: {
-    width: "100%",
     backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20
   },
   title: {
     fontWeight: 'bold',
+    color: '#000000',
   },
   message: {
     fontSize: 16,
-    marginBottom: 10,
+    color: '#333333',
   },
-  cancelButton: {
-    backgroundColor: '#eee',
-    color: 'black',
-    paddingHorizontal: 30,
-    paddingVertical: 10,
-    borderRadius: 5
+  button: {
+    borderRadius: 5,
+    paddingHorizontal: 10,
   },
   confirmButton: {
     backgroundColor: '#007AFF',
-    paddingHorizontal: 30,
-    paddingVertical: 10,
-    borderRadius: 5
   },
-  confirmText: {
-    color: 'white',
-    fontSize: 17,
-  },
-  cancelText: {
-    color: 'black',
-    fontSize: 17,
-  },
-  actions: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    gap: 10,
-  },
-
+  buttonLabel: {
+    fontSize: 16,
+    fontWeight: '500',
+  }
 });
 
 export default ConfirmDialog;

@@ -9,7 +9,7 @@ import {
   ScrollView,
 } from "react-native";
 import InputField from "../../ui/InputField";
-import { Dialog } from "@rneui/base";
+import { Dialog, Portal } from "react-native-paper";
 import NumberField from "../../ui/NumberField";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -21,7 +21,6 @@ const EditCartItemModal = ({
   removeItem,
 }) => {
   const [itemData, setItemData] = useState(initialData || {});
-
 
   useEffect(() => {
     setItemData(initialData);
@@ -42,112 +41,112 @@ const EditCartItemModal = ({
 
   const isEdit = !!initialData;
 
-
   const handleRemoveItem = (id) => {
     removeItem(id);
     handleClose();
   };
 
   return (
-    <Dialog
-      isVisible={isVisible}
-      onBackdropPress={handleClose}
-      overlayStyle={{
-        padding: 0,
-        width: "100%",
-        backgroundColor: "none",
-        maxHeight: "100%",
-      }}
-    >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+    <Portal>
+      <Dialog
+        visible={isVisible}
+        onDismiss={handleClose}
+        style={{
+          padding: 0,
+          backgroundColor: "none",
+          maxHeight: "100%",
+        }}
       >
-        <ScrollView>
-          <View style={styles.modalContainer}>
-            <View style={styles.header}>
-              <Text style={styles.title}>
-                {isEdit ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm"}
-              </Text>
-              <TouchableOpacity
-                onPress={handleClose}
-                style={{
-                  padding: 10,
-                  backgroundColor: "#eee",
-                  borderRadius: 10,
-                }}
-              >
-                <Ionicons name="close" size={24} color="#000" />
-              </TouchableOpacity>
-            </View>
-
-            <InputField
-              containerStyle={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-              inputStyle={{ width: "70%" }}
-              label="Tên sản phẩm"
-              placeholder="Nhập tên..."
-              value={itemData?.itemName}
-              onChangeText={(value) => handleChange("itemName", value)}
-            />
-            <NumberField
-              label="Số lượng"
-              value={itemData?.quantity}
-              onValueChange={(value) => {
-                handleChange("quantity", value);
-              }}
-              type="number"
-              step={1}
-            />
-            <NumberField
-              label="Giá bán"
-              value={itemData?.itemPrice}
-              onValueChange={(value) => {
-                handleChange("itemPrice", value);
-              }}
-              type="price"
-              step={5000}
-            />
-            <InputField
-              containerStyle={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-              inputStyle={{ width: "100%" }}
-              // label="Ghi chú"
-              placeholder="Nhập ghi chú..."
-              value={itemData?.itemNote}
-              onChangeText={(value) => handleChange("itemNote", value)}
-            />
-            <View style={styles.buttonRow}>
-              <TouchableOpacity
-                style={styles.cancelBtn}
-                onPress={() => handleRemoveItem(itemData.itemID)}
-              >
-                <Ionicons name="trash" size={24} color="#eb1600" />
-                <Text style={styles.cancelText}>Xoá</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.saveBtn,
-                  !itemData?.quantity && { opacity: 0.5 },
-                ]}
-                onPress={handleSave}
-                disabled={!itemData?.quantity}
-              >
-                <Text style={styles.btnText}>
-                  {isEdit ? "Cập nhật" : "Lưu"}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
+          <ScrollView>
+            <View style={styles.modalContainer}>
+              <View style={styles.header}>
+                <Text style={styles.title}>
+                  {isEdit ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm"}
                 </Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleClose}
+                  style={{
+                    padding: 10,
+                    backgroundColor: "#eee",
+                    borderRadius: 10,
+                  }}
+                >
+                  <Ionicons name="close" size={24} color="#000" />
+                </TouchableOpacity>
+              </View>
+
+              <InputField
+                containerStyle={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+                inputStyle={{ width: "70%" }}
+                label="Tên sản phẩm"
+                placeholder="Nhập tên..."
+                value={itemData?.itemName}
+                onChangeText={(value) => handleChange("itemName", value)}
+              />
+              <NumberField
+                label="Số lượng"
+                value={itemData?.quantity}
+                onValueChange={(value) => {
+                  handleChange("quantity", value);
+                }}
+                type="number"
+                step={1}
+              />
+              <NumberField
+                label="Giá bán"
+                value={itemData?.itemPrice}
+                onValueChange={(value) => {
+                  handleChange("itemPrice", value);
+                }}
+                type="price"
+                step={5000}
+              />
+              <InputField
+                containerStyle={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+                inputStyle={{ width: "100%" }}
+                // label="Ghi chú"
+                placeholder="Nhập ghi chú..."
+                value={itemData?.itemNote}
+                onChangeText={(value) => handleChange("itemNote", value)}
+              />
+              <View style={styles.buttonRow}>
+                <TouchableOpacity
+                  style={styles.cancelBtn}
+                  onPress={() => handleRemoveItem(itemData.itemID)}
+                >
+                  <Ionicons name="trash" size={24} color="#eb1600" />
+                  <Text style={styles.cancelText}>Xoá</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.saveBtn,
+                    !itemData?.quantity && { opacity: 0.5 },
+                  ]}
+                  onPress={handleSave}
+                  disabled={!itemData?.quantity}
+                >
+                  <Text style={styles.btnText}>
+                    {isEdit ? "Cập nhật" : "Lưu"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </Dialog>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </Dialog>
+    </Portal>
   );
 };
 
@@ -158,7 +157,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 20,
-    marginHorizontal: 20,
+    marginHorizontal: 0,
   },
   header: {
     flexDirection: "row",
